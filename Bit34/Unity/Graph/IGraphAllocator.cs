@@ -1,4 +1,4 @@
-﻿namespace Minic.Unity.Graph
+﻿namespace Bit34.Unity.Graph
 {
     public interface IGraphAllocator<TNodeData, TNode>
         where TNodeData : new()

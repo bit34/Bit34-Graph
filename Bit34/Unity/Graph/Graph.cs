@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace Minic.Unity.Graph
+namespace Bit34.Unity.Graph
 {
     public class Graph<TNodeData, TNode, TPath>
         where TNodeData : new()

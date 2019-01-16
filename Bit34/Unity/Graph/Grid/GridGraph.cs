@@ -1,4 +1,4 @@
-﻿namespace Minic.Unity.Graph.Grid
+﻿namespace Bit34.Unity.Graph.Grid
 {
     public abstract class GridGraph<TNodeData, TNode, TPath> : Graph<TNodeData, TNode, TPath>
         where TNodeData : new()

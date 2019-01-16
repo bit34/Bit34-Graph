@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 
-namespace Minic.Unity.Graph
+namespace Bit34.Unity.Graph
 {
     public class GraphPath<TNodeData, TNode>
         where TNodeData : new()

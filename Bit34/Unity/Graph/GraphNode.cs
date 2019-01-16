@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 
-namespace Minic.Unity.Graph
+namespace Bit34.Unity.Graph
 {
 
     public class GraphNode<TData>
