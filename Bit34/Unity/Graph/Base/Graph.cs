@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 
 
-namespace Bit34.Unity.Graph
+namespace Bit34.Unity.Graph.Base
 {
-    public class Graph<TNodeData, TNode, TPath>
-        where TNodeData : new()
-        where TNode : GraphNode<TNodeData>, new()
-        where TPath : GraphPath<TNodeData, TNode>, new()
+    public class Graph<TNode, TEdge>
+        where TNode : GraphNode
+        where TEdge : GraphEdge
     {
         //	MEMBERS
         public bool IsFixed { get; protected set; }
-        private IGraphAllocator<TNodeData, TNode> _Allocator;
-        private int                    _NodeIdCounter;
-        private LinkedList<TNode>      _NodeList;
-        private Dictionary<int, TNode> _NodesById;
-        private int                    _OperationId;
+        //      Internal
+        private IGraphAllocator<TNode, TEdge> _Allocator;
+        private int                           _NodeIdCounter;
+        private LinkedList<TNode>             _NodeList;
+        private Dictionary<int, TNode>        _NodesById;
+        private int                           _OperationId;
 
 
         //  CONSTRUCTORS
-        public Graph(IGraphAllocator<TNodeData, TNode> allocator)
+        public Graph(IGraphAllocator<TNode, TEdge> allocator)
         {
             IsFixed = false;
             _Allocator     = allocator;
@@ -39,19 +39,21 @@ namespace Bit34.Unity.Graph
             }
 
             TNode node = _Allocator.CreateNode();
-            node.InitializeNode(this, _NodeIdCounter++, staticEdgeCount);
+            node.AddedToGraph(this, _NodeIdCounter++, staticEdgeCount);
             _NodeList.AddLast(node);
             _NodesById.Add(node.Id, node);
 
             return node;
         }
 
-        public void RemoveNode(TNode node)
+        public void RemoveNode(int nodeId)
         {
             if (IsFixed)
             {
                 throw new Exception("Graph Exception:Cannot remove node from a fixed graph");
             }
+
+            TNode node = _NodesById[nodeId];
 
             if (node.OwnerGraph != this)
             {
@@ -61,7 +63,7 @@ namespace Bit34.Unity.Graph
             //  Remove referencing static edges
             for (int i = 0; i < node.StaticEdgeCount; i++)
             {
-                GraphEdge edge = node.GetStaticEdge(i);
+                TEdge edge = (TEdge)node.GetStaticEdge(i);
                 if (edge != null)
                 {
                     DeleteEdge(edge);
@@ -69,10 +71,9 @@ namespace Bit34.Unity.Graph
             }
 
             //  Remove referencing dynamic edges
-            IEnumerator<GraphEdge> edges = node.GetDynamicEdgeEnumerator();
-            while (edges.MoveNext() == true)
+            while (node.DynamicEdgeCount>0)
             {
-                GraphEdge edge = edges.Current;
+                TEdge edge = (TEdge)node.GetFirstDynamicEdge();
                 DeleteEdge(edge);
             }
 
@@ -94,7 +95,7 @@ namespace Bit34.Unity.Graph
             return _NodesById[id];
         }
 
-        public GraphEdge CreateEdge(TNode source, TNode target, int sourceEdgeIndex = -1, int targetEdgeIndex = -1, bool createOpposite = true)
+        public TEdge CreateEdge(TNode source, TNode target, int sourceEdgeIndex = -1, int targetEdgeIndex = -1, bool createOpposite = true)
         {
             if (source.OwnerGraph != this && target.OwnerGraph != this)
             {
@@ -102,10 +103,10 @@ namespace Bit34.Unity.Graph
             }
 
             //	Create edge
-            GraphEdge edge = _Allocator.CreateEdge();
+            TEdge edge = _Allocator.CreateEdge();
 
             //	Create opposite edge
-            GraphEdge oppositeEdge = null;
+            TEdge oppositeEdge = null;
             if (createOpposite)
             {
                 oppositeEdge = _Allocator.CreateEdge();
@@ -122,7 +123,7 @@ namespace Bit34.Unity.Graph
             {
                 if (source.GetStaticEdge(sourceEdgeIndex) != null)
                 {
-                    DeleteEdge(source.GetStaticEdge(sourceEdgeIndex));
+                    DeleteEdge((TEdge)source.GetStaticEdge(sourceEdgeIndex));
                 }
                 source.SetStaticEdge(sourceEdgeIndex, edge);
             }
@@ -140,7 +141,7 @@ namespace Bit34.Unity.Graph
                 {
                     if (target.GetStaticEdge(targetEdgeIndex) != null)
                     {
-                        DeleteEdge(target.GetStaticEdge(targetEdgeIndex));
+                        DeleteEdge((TEdge)target.GetStaticEdge(targetEdgeIndex));
                     }
                     target.SetStaticEdge(targetEdgeIndex, oppositeEdge);
                 }
@@ -149,7 +150,7 @@ namespace Bit34.Unity.Graph
             return edge;
         }
 
-        public void DeleteEdge(GraphEdge edge, bool deleteOpposite = true)
+        public void DeleteEdge(TEdge edge, bool deleteOpposite = true)
         {
             //  Remove edge connections
             if (edge.SourceEdgeIndex == -1)
@@ -162,7 +163,7 @@ namespace Bit34.Unity.Graph
             }
 
             //  Remove edge
-            GraphEdge oppositeEdge = edge.OppositeEdge;
+            TEdge oppositeEdge = (TEdge)edge.OppositeEdge;
             edge.Reset();
             _Allocator.FreeEdge(edge);
 
@@ -180,14 +181,19 @@ namespace Bit34.Unity.Graph
             }
         }
 
-        public TPath FindPath(TNode startNode, TNode endNode, GraphPathConfig config, GraphAgent agent = null)
+        public bool FindPath(int startNodeId, int targetNodeId, GraphPathConfig pathConfig, GraphPath path, GraphAgent agent = null)
+        {
+            return FindPath(_NodesById[startNodeId], _NodesById[targetNodeId], pathConfig, path, agent);
+        }
+
+        public bool FindPath(TNode startNode, TNode endNode, GraphPathConfig pathConfig, GraphPath path, GraphAgent agent = null)
         {
             //  New operation id
             int openListOperationId = ++_OperationId;
             int closedListOperationId = ++_OperationId;
 
             //  OpenList
-            LinkedList<GraphNode<TNodeData>> openNodeList = new LinkedList<GraphNode<TNodeData>>();
+            LinkedList<TNode> openNodeList = new LinkedList<TNode>();
 
             //  Add start node to open list
             startNode.OperationId = openListOperationId;
@@ -199,7 +205,7 @@ namespace Bit34.Unity.Graph
             while (openNodeList.Count > 0)
             {
                 //  Remove node and mark as closed
-                GraphNode<TNodeData> openNode = (GraphNode<TNodeData>)PickNodeWithLowestOperationParam(openNodeList);
+                TNode openNode = (TNode)PickNodeWithLowestOperationParam(openNodeList);
                 openNode.OperationId = closedListOperationId;
 
                 ////  Stop when end reached
@@ -209,22 +215,22 @@ namespace Bit34.Unity.Graph
                 //}
 
                 //  Iterate static edges of node
-                if (config.UseStaticEdges)
+                if (pathConfig.UseStaticEdges)
                 {
                     for (int i = openNode.StaticEdgeCount - 1; i >= 0; i--)
                     {
                         //  Has static edge
-                        GraphEdge edge = openNode.GetStaticEdge(i);
+                        TEdge edge = (TEdge)openNode.GetStaticEdge(i);
                         if (edge != null)
                         {
                             //  Check edge access restriction
-                            if (config.IsEdgeAccessible != null && config.IsEdgeAccessible(edge, agent) == false)
+                            if (pathConfig.IsEdgeAccessible != null && pathConfig.IsEdgeAccessible(edge, agent) == false)
                             {
                                 continue;
                             }
 
                             //  begin edge process
-                            GraphNode<TNodeData> targetNode = _NodesById[edge.TargetNodeId];
+                            TNode targetNode = _NodesById[edge.TargetNodeId];
                             float weightToNode = openNode.OperationParam + edge.Weight;
 
                             //  If node is not visited
@@ -249,7 +255,7 @@ namespace Bit34.Unity.Graph
                 }
 
                 //  Iterate dynamic edges on node
-                if (config.UseDynamicEdges)
+                if (pathConfig.UseDynamicEdges)
                 {
                     IEnumerator<GraphEdge> edges = openNode.GetDynamicEdgeEnumerator();
                     while (edges.MoveNext())
@@ -257,13 +263,13 @@ namespace Bit34.Unity.Graph
                         GraphEdge edge = edges.Current;
 
                         //  Check edge access restriction
-                        if (config.IsEdgeAccessible != null && config.IsEdgeAccessible(edge, agent) == false)
+                        if (pathConfig.IsEdgeAccessible != null && pathConfig.IsEdgeAccessible(edge, agent) == false)
                         {
                             continue;
                         }
 
                         //  begin edge process
-                        GraphNode<TNodeData> targetNode = _NodesById[edge.TargetNodeId];
+                        TNode targetNode = _NodesById[edge.TargetNodeId];
                         float weightToNode = openNode.OperationParam + edge.Weight;
 
                         //  If node is not visited
@@ -290,39 +296,36 @@ namespace Bit34.Unity.Graph
             //  Is end node reached
             if (endNode.OperationId == closedListOperationId)
             {
-                //  Create path item list
-                LinkedList<GraphEdge> pathItems = new LinkedList<GraphEdge>();
+                //  Init path
+                path.Init(startNode.Id, endNode.Id);
 
                 //  Backtrack edges from end to start
-                GraphEdge edge = endNode.SelectedEdge;
+                TEdge edge = (TEdge)endNode.SelectedEdge;
 
                 do
                 {
-                    pathItems.AddFirst(edge);
-                    edge = _NodesById[edge.SourceNodeId].SelectedEdge;
+                    path.Edges.AddFirst(edge);
+                    edge = (TEdge)_NodesById[edge.SourceNodeId].SelectedEdge;
                 }
                 while (edge != null);
 
-                //  create path by backtracing from end
-                TPath path = new TPath();
-                path.Set(startNode, endNode, pathItems);
-                return path;
+                return true;
             }
 
             //  No valid path
-            return null;
+            return false;
         }
 
-        virtual protected float CalculateEdgeWeight(GraphNode<TNodeData> sourceNode, GraphNode<TNodeData> targetNode)
+        virtual protected float CalculateEdgeWeight(TNode sourceNode, TNode targetNode)
         {
             return (targetNode.Position - sourceNode.Position).magnitude;
         }
 
-        private GraphNode<TNodeData> PickNodeWithLowestOperationParam(LinkedList<GraphNode<TNodeData>> nodeList)
+        private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)
         {
-            LinkedListNode<GraphNode<TNodeData>> lowest = nodeList.First;
+            LinkedListNode<TNode> lowest = nodeList.First;
 
-            LinkedListNode<GraphNode<TNodeData>> current = lowest.Next;
+            LinkedListNode<TNode> current = lowest.Next;
             while (current != null)
             {
                 if (current.Value.OperationParam < lowest.Value.OperationParam)
@@ -332,7 +335,7 @@ namespace Bit34.Unity.Graph
                 current = current.Next;
             }
 
-            GraphNode<TNodeData> node = lowest.Value;
+            TNode node = lowest.Value;
             nodeList.Remove(lowest);
             return node;
         }

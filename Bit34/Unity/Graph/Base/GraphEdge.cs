@@ -1,4 +1,4 @@
-﻿namespace Bit34.Unity.Graph
+﻿namespace Bit34.Unity.Graph.Base
 {
     public class GraphEdge
     {
@@ -9,6 +9,9 @@
         public int TargetEdgeIndex { get; private set; }
         public float Weight { get; private set; }
         public GraphEdge OppositeEdge { get; private set; }
+        //      Internal
+        private object _Data;
+
 
 
         //  CONSTRUCTORS
@@ -22,6 +25,16 @@
             Weight = weight;
         }
 
+        public TData GetData<TData>()
+        {
+            return (TData)_Data;
+        }
+
+        internal void InitData(object data)
+        {
+            _Data = data;
+        }
+        
         internal void Set(int sourceNodeId, int sourceEdgeIndex, int targetNodeId, int targetEdgeIndex, float weight, GraphEdge oppositeEdge)
         {
             SourceNodeId    = sourceNodeId;

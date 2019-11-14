@@ -1,9 +1,12 @@
-﻿namespace Bit34.Unity.Graph.Grid
+﻿using Bit34.Unity.Graph.Base;
+using Bit34.Unity.Graph.Grid;
+
+
+namespace Bit34.Unity.Graph.Rectangle
 {
-    public class RectangleGraph<TNodeData, TNode, TPath> : GridGraph<TNodeData, TNode, TPath>
-        where TNodeData : new()
-        where TNode : GridGraphNode<TNodeData>, new()
-        where TPath : GridGraphPath<TNodeData, TNode>, new()
+    public class RectangleGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
+        where TNode : GridGraphNode
+        where TEdge : GraphEdge
     {
         //  MEMBERS
         public readonly int ColumnCount;
@@ -13,7 +16,7 @@
 
 
         //  CONSTRUCTOR(S)
-        public RectangleGraph(int columnCount, int rowCount, RectangleGraphConfig config, IGraphAllocator<TNodeData, TNode> allocator) :
+        public RectangleGraph(int columnCount, int rowCount, RectangleGraphConfig config, IGraphAllocator<TNode, TEdge> allocator) :
             base(config, allocator)
         {
             ColumnCount = columnCount;

@@ -1,4 +1,4 @@
-﻿namespace Bit34.Unity.Graph
+﻿namespace Bit34.Unity.Graph.Base
 {
     public class GraphPathConfig
     {
@@ -7,8 +7,8 @@
 
 
         //  MEMBERS
-        public readonly bool UseStaticEdges;
-        public readonly bool UseDynamicEdges;
+        public readonly bool              UseStaticEdges;
+        public readonly bool              UseDynamicEdges;
         public readonly EdgeAgentDelegate IsEdgeAccessible;
 
 

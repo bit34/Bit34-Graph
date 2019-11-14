@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using Bit34.Unity.Graph.Grid;
 
 
-namespace Bit34.Unity.Graph.Grid
+namespace Bit34.Unity.Graph.Rectangle
 {
     public class RectangleGraphConfig : GridGraphConfig
     {

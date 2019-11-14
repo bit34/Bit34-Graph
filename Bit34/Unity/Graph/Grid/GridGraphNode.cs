@@ -1,11 +1,13 @@
-﻿namespace Bit34.Unity.Graph.Grid
+﻿using Bit34.Unity.Graph.Base;
+
+
+namespace Bit34.Unity.Graph.Grid
 {
-    public class GridGraphNode<TNodeData> : GraphNode<TNodeData>
-        where TNodeData : new()
+    public class GridGraphNode : GraphNode
     {
         //  MEMBERS
         public int Column { get; private set; }
-        public int Row { get; private set; }
+        public int Row    { get; private set; }
 
 
         //  CONSTRUCTORS
@@ -16,7 +18,7 @@
         internal void SetLocation(int column, int row)
         {
             Column = column;
-            Row = row;
+            Row    = row;
         }
     }
 }
