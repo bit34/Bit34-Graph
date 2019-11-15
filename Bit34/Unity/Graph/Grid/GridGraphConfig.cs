@@ -17,6 +17,6 @@ namespace Bit34.Unity.Graph.Grid
 
 
         //  METHODS
-        public abstract Vector3 GetNodePostion(int column, int row);
+        public abstract Vector3 GetNodePosition(int column, int row);
     }
 }

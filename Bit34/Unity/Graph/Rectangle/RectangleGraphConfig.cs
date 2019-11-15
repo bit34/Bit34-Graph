@@ -30,7 +30,7 @@ namespace Bit34.Unity.Graph.Rectangle
             HasDiagonalEdges = hasDiagonalEdges;
         }
 
-        public override Vector3 GetNodePostion(int column, int row)
+        public override Vector3 GetNodePosition(int column, int row)
         {
             return (XAxis * column) + (YAxis * row);
         }

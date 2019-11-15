@@ -95,6 +95,11 @@ namespace Bit34.Unity.Graph.Base
             return _NodesById[id];
         }
 
+        public TEdge CreateEdge(int sourceNodeId, int targetNodeId, int sourceEdgeIndex = -1, int targetEdgeIndex = -1, bool createOpposite = true)
+        {
+            return CreateEdge(_NodesById[sourceNodeId], _NodesById[targetNodeId], sourceEdgeIndex, targetEdgeIndex, createOpposite);
+        }
+        
         public TEdge CreateEdge(TNode source, TNode target, int sourceEdgeIndex = -1, int targetEdgeIndex = -1, bool createOpposite = true)
         {
             if (source.OwnerGraph != this && target.OwnerGraph != this)

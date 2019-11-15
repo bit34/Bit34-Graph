@@ -55,7 +55,7 @@ namespace Bit34.Unity.Graph.Rectangle
                 {
                     TNode node = CreateNode(Config.StaticEdgeCount);
                     node.SetLocation(c, r);
-                    node.Position = Config.GetNodePostion(c, r);
+                    node.Position = Config.GetNodePosition(c, r);
                     _Nodes[ColumnCount*r+c] = node;
                 }
             }

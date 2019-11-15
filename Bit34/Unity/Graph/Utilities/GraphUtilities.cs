@@ -7,7 +7,7 @@ namespace Bit34.Unity.Graph.Utilities
 {
     public static class GraphUtilities
     {
-        static public void DrawStaticEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial)
+        static public void DrawStaticEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
             where TNode : GraphNode
             where TEdge : GraphEdge
         {
@@ -25,8 +25,8 @@ namespace Bit34.Unity.Graph.Utilities
                     
                     if(edge!=null)
                     {
-                        GL.Vertex( graph.GetNodeById(edge.SourceNodeId).Position );
-                        GL.Vertex( graph.GetNodeById(edge.TargetNodeId).Position );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
                     }
                 }
             }
@@ -34,7 +34,7 @@ namespace Bit34.Unity.Graph.Utilities
             GL.End();
         }
 
-        static public void DrawDynamicEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial)
+        static public void DrawDynamicEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
             where TNode : GraphNode
             where TEdge : GraphEdge
         {
@@ -51,15 +51,15 @@ namespace Bit34.Unity.Graph.Utilities
                 {
                     GraphEdge edge = edges.Current;
                     
-                    GL.Vertex( graph.GetNodeById(edge.SourceNodeId).Position );
-                    GL.Vertex( graph.GetNodeById(edge.TargetNodeId).Position );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
                 }
             }
 
             GL.End();
         }
 
-        static public void DrawPath<TNode, TEdge>(Graph<TNode, TEdge> graph, GraphPath path, Material edgeMaterial)
+        static public void DrawPath<TNode, TEdge>(Graph<TNode, TEdge> graph, GraphPath path, Material edgeMaterial, Matrix4x4 matrix)
             where TNode : GraphNode
             where TEdge : GraphEdge
         {
@@ -71,8 +71,8 @@ namespace Bit34.Unity.Graph.Utilities
             {
                 GraphEdge edge = edges.Current;
 
-                GL.Vertex( graph.GetNodeById(edge.SourceNodeId).Position );
-                GL.Vertex( graph.GetNodeById(edge.TargetNodeId).Position );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
             }
 
             GL.End();
