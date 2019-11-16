@@ -28,7 +28,7 @@ namespace Bit34.Unity.Graph.Base
             _NodeIds.Remove(nodeId);
         }
 
-        public void Add(GraphNodeGroup group)
+        public void Append(GraphNodeGroup group)
         {
             IEnumerator<int> nodeIds = group.GetEnumerator();
             while (nodeIds.MoveNext())
@@ -40,6 +40,11 @@ namespace Bit34.Unity.Graph.Base
         public bool Has(int nodeId)
         {
             return _NodeIds.Contains(nodeId);
+        }
+
+        public void Clear()
+        {
+            _NodeIds.Clear();
         }
 
         public IEnumerator<int> GetEnumerator()
