@@ -1,4 +1,4 @@
-# Minic Graph Library
+# Bit34 Unity Graph Library
 
 This is a minimal graph library. It is written in C#.
 
@@ -8,4 +8,4 @@ This is a minimal graph library. It is written in C#.
 - Graph class with basic functionallity
 - GridGraph sub class for regular structured graphs
 - RectangleGraph subclass for handling rectangular grids with all graph functionallity
-- HexagonGraph subclass for handling hexagonal grids with all graph functionallity
+- TBA -> HexagonGraph subclass for handling hexagonal grids with all graph functionallity
