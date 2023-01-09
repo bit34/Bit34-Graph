@@ -1,21 +1,21 @@
-﻿using Bit34.Unity.Graph.Base;
+﻿using Com.Bit34Games.Graph.Generic;
 
 
-namespace Bit34.Unity.Graph.Grid
+namespace Com.Bit34Games.Graph.Grid
 {
     public abstract class GridGraph<TNode, TEdge> : Graph<TNode, TEdge>
         where TNode : GridGraphNode
         where TEdge : GraphEdge
     {
         //  MEMBERS
-        private readonly GridGraphConfig _GridConfig;
+        private readonly GridGraphConfig _gridConfig;
 
 
         //  CONSTRUCTORS
-        public GridGraph(GridGraphConfig config, IGraphAllocator<TNode, TEdge> allocator) :
-            base(allocator)
+        public GridGraph(GridGraphConfig gridConfig, IGraphAllocator<TNode, TEdge> allocator) :
+            base(gridConfig, allocator)
         {
-            _GridConfig = config;
+            _gridConfig = gridConfig;
         }
 
 
@@ -26,7 +26,7 @@ namespace Bit34.Unity.Graph.Grid
         
         public int GetOppositeEdge(int edge)
         {
-            return (edge + (_GridConfig.StaticEdgeCount / 2)) % _GridConfig.StaticEdgeCount;
+            return (edge + (_gridConfig.staticEdgeCount / 2)) % _gridConfig.staticEdgeCount;
         }
 
     }

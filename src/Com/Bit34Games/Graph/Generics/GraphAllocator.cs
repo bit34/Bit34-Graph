@@ -1,13 +1,13 @@
-﻿namespace Bit34.Unity.Graph.Base
+﻿namespace Com.Bit34Games.Graph.Generic
 {
-    public class GraphDefaultAllocator<TNode, TEdge, TNodeData, TEdgeData> : IGraphAllocator<TNode, TEdge>
+    public class GraphAllocator<TNode, TEdge, TNodeData, TEdgeData> : IGraphAllocator<TNode, TEdge>
         where TNode : GraphNode, new()
         where TEdge : GraphEdge, new()
         where TNodeData : new()
         where TEdgeData : new()
     {
         //  CONSTRUCTORS
-        public GraphDefaultAllocator() { }
+        public GraphAllocator() { }
 
         //  METHODS
         public TNode CreateNode() { TNode node = new TNode(); node.InitData(new TNodeData()); return node; }

@@ -1,7 +1,7 @@
-﻿using Bit34.Unity.Graph.Base;
+﻿using Com.Bit34Games.Graph.Generic;
 
 
-namespace Bit34.Unity.Graph.Grid
+namespace Com.Bit34Games.Graph.Grid
 {
     public class GridGraphNode : GraphNode
     {

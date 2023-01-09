@@ -1,4 +1,4 @@
-﻿namespace Bit34.Unity.Graph.Base
+﻿namespace Com.Bit34Games.Graph.Generic
 {
     public interface IGraphAllocator<TNode, TEdge>
         where TNode : GraphNode

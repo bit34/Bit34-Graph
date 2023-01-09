@@ -1,27 +1,31 @@
-﻿using Bit34.Unity.Graph.Base;
-using Bit34.Unity.Graph.Grid;
+﻿using Com.Bit34Games.Graph.Generic;
+using Com.Bit34Games.Graph.Grid;
 
 
-namespace Bit34.Unity.Graph.Rectangle
+namespace Com.Bit34Games.Graph.Rectangle
 {
     public class RectangleGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
         where TNode : GridGraphNode
         where TEdge : GraphEdge
     {
         //  MEMBERS
-        public readonly int ColumnCount;
-        public readonly int RowCount;
-        public readonly RectangleGraphConfig Config;
-        private TNode[] _Nodes;
+        public readonly RectangleGraphConfig rectangleConfig;
+        public readonly int                  columnCount;
+        public readonly int                  rowCount;
+        //      Internal
+        private TNode[] _nodes;
 
 
         //  CONSTRUCTOR(S)
-        public RectangleGraph(int columnCount, int rowCount, RectangleGraphConfig config, IGraphAllocator<TNode, TEdge> allocator) :
-            base(config, allocator)
+        public RectangleGraph(RectangleGraphConfig          rectangleConfig,
+                              IGraphAllocator<TNode, TEdge> allocator,
+                              int                           columnCount,
+                              int                           rowCount) :
+            base(rectangleConfig, allocator)
         {
-            ColumnCount = columnCount;
-            RowCount = rowCount;
-            Config = config;
+            this.rectangleConfig = rectangleConfig;
+            this.columnCount     = columnCount;
+            this.rowCount        = rowCount;
 
             CreateNodes();
             CreateEdges();
@@ -33,42 +37,42 @@ namespace Bit34.Unity.Graph.Rectangle
         //  METHODS
         override public TNode GetNodeByLocation( int column, int row)
         {
-            return _Nodes[column+(row*ColumnCount)];
+            return _nodes[column+(row*columnCount)];
         }
 
         override public TNode TryGetNodeByLocation(int column, int row)
         {
-            if (column >= 0 && column < ColumnCount && row >= 0 && row < RowCount)
+            if (column >= 0 && column < columnCount && row >= 0 && row < rowCount)
             {
-                return _Nodes[column + (row * ColumnCount)];
+                return _nodes[column + (row * columnCount)];
             }
             return null;
         }
 
         private void CreateNodes()
         {
-            _Nodes = new TNode[ColumnCount* RowCount];
+            _nodes = new TNode[columnCount* rowCount];
 
-            for (int c = 0; c < ColumnCount; c++)
+            for (int c = 0; c < columnCount; c++)
             {
-                for (int r = 0; r < RowCount; r++)
+                for (int r = 0; r < rowCount; r++)
                 {
-                    TNode node = CreateNode(Config.StaticEdgeCount);
+                    TNode node = CreateNode();
                     node.SetLocation(c, r);
-                    node.Position = Config.GetNodePosition(c, r);
-                    _Nodes[ColumnCount*r+c] = node;
+                    node.Position = rectangleConfig.GetNodePosition(c, r);
+                    _nodes[columnCount*r+c] = node;
                 }
             }
         }
 
         private void CreateEdges()
         {
-            if (Config.HasStraightEdges == true)
+            if (rectangleConfig.hasStraightEdges == true)
             {
                 CreateStraightEdges();
             }
 
-            if (Config.HasDiagonalEdges == true)
+            if (rectangleConfig.hasDiagonalEdges == true)
             {
                 CreateDiagonalEdges();
             }
@@ -79,19 +83,19 @@ namespace Bit34.Unity.Graph.Rectangle
             int horizontalEdge = (int)RectangleGraphEdges.RIGHT;
             int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);
 
-            int verticalEdge = (Config.IsYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
+            int verticalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
             int verticalOppositeEdge = GetOppositeEdge(verticalEdge);
 
-            for (int c = 0; c < ColumnCount; c++)
+            for (int c = 0; c < columnCount; c++)
             {
-                for (int r = 0; r < RowCount; r++)
+                for (int r = 0; r < rowCount; r++)
                 {
-                    if (c < ColumnCount - 1)
+                    if (c < columnCount - 1)
                     {
                         CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r), horizontalEdge, horizontalOppositeEdge, true);
                     }
 
-                    if (r < RowCount - 1)
+                    if (r < rowCount - 1)
                     {
                         CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c, r + 1), verticalEdge, verticalOppositeEdge, true);
                     }
@@ -101,22 +105,22 @@ namespace Bit34.Unity.Graph.Rectangle
 
         private void CreateDiagonalEdges()
         {
-            int rightDiagonalEdge = (Config.IsYAxisUp) ? ((int)RectangleGraphEdges.RIGHT_UP) : ((int)RectangleGraphEdges.RIGHT_DOWN);
+            int rightDiagonalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.RIGHT_UP) : ((int)RectangleGraphEdges.RIGHT_DOWN);
             int rightDiagonalOppositeEdge = GetOppositeEdge(rightDiagonalEdge);
 
-            int leftDiagonalEdge = (Config.IsYAxisUp) ? ((int)RectangleGraphEdges.LEFT_UP) : ((int)RectangleGraphEdges.LEFT_DOWN);
+            int leftDiagonalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.LEFT_UP) : ((int)RectangleGraphEdges.LEFT_DOWN);
             int leftDiagonalOppositeEdge = GetOppositeEdge(leftDiagonalEdge);
 
-            for (int c = 0; c < ColumnCount; c++)
+            for (int c = 0; c < columnCount; c++)
             {
-                for (int r = 0; r < RowCount; r++)
+                for (int r = 0; r < rowCount; r++)
                 {
-                    if (c < ColumnCount - 1 && r < RowCount - 1)
+                    if (c < columnCount - 1 && r < rowCount - 1)
                     {
                         CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r + 1), rightDiagonalEdge, rightDiagonalOppositeEdge, true);
                     }
 
-                    if (c > 0 && r < RowCount - 1)
+                    if (c > 0 && r < rowCount - 1)
                     {
                         CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c - 1, r + 1), leftDiagonalEdge, leftDiagonalOppositeEdge, true);
                     }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 
-namespace Bit34.Unity.Graph.Base
+namespace Com.Bit34Games.Graph.Generic
 {
     public class GraphNodeGroup
     {

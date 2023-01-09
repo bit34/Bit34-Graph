@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Bit34.Unity.Graph.Base;
+using Com.Bit34Games.Graph.Generic;
 
 
-namespace Bit34.Unity.Graph.Utilities
+namespace Bit34.Graph.Utilities
 {
     public static class GraphUtilities
     {
@@ -25,8 +25,8 @@ namespace Bit34.Unity.Graph.Utilities
                     
                     if(edge!=null)
                     {
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
                     }
                 }
             }
@@ -51,8 +51,8 @@ namespace Bit34.Unity.Graph.Utilities
                 {
                     GraphEdge edge = edges.Current;
                     
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
                 }
             }
 
@@ -71,8 +71,8 @@ namespace Bit34.Unity.Graph.Utilities
             {
                 GraphEdge edge = edges.Current;
 
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.SourceNodeId).Position ) );
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNodeById(edge.TargetNodeId).Position ) );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
             }
 
             GL.End();
