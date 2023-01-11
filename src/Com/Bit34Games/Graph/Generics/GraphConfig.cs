@@ -1,6 +1,6 @@
 namespace Com.Bit34Games.Graph.Generic
 {
-    public abstract class GraphConfig
+    public class GraphConfig
     {
         //  MEMBERS
         public readonly int staticEdgeCount;

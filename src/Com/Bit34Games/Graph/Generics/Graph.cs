@@ -19,7 +19,7 @@ namespace Com.Bit34Games.Graph.Generic
 
 
         //  CONSTRUCTORS
-        public Graph(GraphConfig config,IGraphAllocator<TNode, TEdge> allocator)
+        public Graph(GraphConfig config, IGraphAllocator<TNode, TEdge> allocator)
         {
             IsFixed        = false;
             _config        = config;
@@ -58,7 +58,7 @@ namespace Com.Bit34Games.Graph.Generic
                 throw new Exception("Graph Exception:Cannot remove node, node with id:" + nodeId + " does note exist");
             }
 
-            if (node.OwnerGraph != this)
+            if (node.ownerGraph != this)
             {
                 throw new Exception("Graph Exception:Cannot remove node, it does not belong to this graph");
             }
@@ -116,7 +116,7 @@ namespace Com.Bit34Games.Graph.Generic
                                 int   targetEdgeIndex = -1,
                                 bool  createOpposite = true)
         {
-            if (source.OwnerGraph != this || target.OwnerGraph != this)
+            if (source.ownerGraph != this || target.ownerGraph != this)
             {
                 throw new Exception("Graph Exception:Cannot create edge, node(s) does not belong to this graph");
             }
@@ -215,9 +215,9 @@ namespace Com.Bit34Games.Graph.Generic
             LinkedList<TNode> openNodeList = new LinkedList<TNode>();
 
             //  Add start node to open list
-            startNode.OperationId = openListOperationId;
-            startNode.OperationParam = 0;
-            startNode.SelectedEdge = null;
+            startNode.operationId = openListOperationId;
+            startNode.operationParam = 0;
+            startNode.selectedEdge = null;
             openNodeList.AddLast(startNode);
 
             //  Iterate open nodes until end node is reached or no open nodes left in queue
@@ -225,7 +225,7 @@ namespace Com.Bit34Games.Graph.Generic
             {
                 //  Remove node and mark as closed
                 TNode openNode = (TNode)PickNodeWithLowestOperationParam(openNodeList);
-                openNode.OperationId = closedListOperationId;
+                openNode.operationId = closedListOperationId;
 
                 ////  Stop when end reached
                 //if (openNode==endNode)
@@ -234,7 +234,7 @@ namespace Com.Bit34Games.Graph.Generic
                 //}
 
                 //  Iterate static edges of node
-                if (pathConfig.UseStaticEdges)
+                if (pathConfig.useStaticEdges)
                 {
                     for (int i = openNode.StaticEdgeCount - 1; i >= 0; i--)
                     {
@@ -243,29 +243,29 @@ namespace Com.Bit34Games.Graph.Generic
                         if (edge != null)
                         {
                             //  Check edge access restriction
-                            if (pathConfig.IsEdgeAccessible != null && pathConfig.IsEdgeAccessible(edge, agent) == false)
+                            if (pathConfig.isEdgeAccessible != null && pathConfig.isEdgeAccessible(edge, agent) == false)
                             {
                                 continue;
                             }
 
                             //  begin edge process
                             TNode targetNode = _nodes[edge.TargetNodeId];
-                            float weightToNode = openNode.OperationParam + edge.Weight;
+                            float weightToNode = openNode.operationParam + edge.Weight;
 
                             //  If node is not visited
-                            if (targetNode.OperationId != openListOperationId && targetNode.OperationId != closedListOperationId)
+                            if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
                             {
-                                targetNode.OperationId = openListOperationId;
-                                targetNode.OperationParam = weightToNode;
-                                targetNode.SelectedEdge = edge;
+                                targetNode.operationId = openListOperationId;
+                                targetNode.operationParam = weightToNode;
+                                targetNode.selectedEdge = edge;
                                 openNodeList.AddLast(targetNode);
                             }
-                            else if (targetNode.OperationId == openListOperationId)
+                            else if (targetNode.operationId == openListOperationId)
                             {
-                                if (targetNode.OperationParam > weightToNode)
+                                if (targetNode.operationParam > weightToNode)
                                 {
-                                    targetNode.OperationParam = weightToNode;
-                                    targetNode.SelectedEdge = edge;
+                                    targetNode.operationParam = weightToNode;
+                                    targetNode.selectedEdge = edge;
                                 }
                             }
                             //  end edge process
@@ -274,7 +274,7 @@ namespace Com.Bit34Games.Graph.Generic
                 }
 
                 //  Iterate dynamic edges on node
-                if (pathConfig.UseDynamicEdges)
+                if (pathConfig.useDynamicEdges)
                 {
                     IEnumerator<GraphEdge> edges = openNode.GetDynamicEdgeEnumerator();
                     while (edges.MoveNext())
@@ -282,29 +282,29 @@ namespace Com.Bit34Games.Graph.Generic
                         GraphEdge edge = edges.Current;
 
                         //  Check edge access restriction
-                        if (pathConfig.IsEdgeAccessible != null && pathConfig.IsEdgeAccessible(edge, agent) == false)
+                        if (pathConfig.isEdgeAccessible != null && pathConfig.isEdgeAccessible(edge, agent) == false)
                         {
                             continue;
                         }
 
                         //  begin edge process
                         TNode targetNode = _nodes[edge.TargetNodeId];
-                        float weightToNode = openNode.OperationParam + edge.Weight;
+                        float weightToNode = openNode.operationParam + edge.Weight;
 
                         //  If node is not visited
-                        if (targetNode.OperationId != openListOperationId && targetNode.OperationId != closedListOperationId)
+                        if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
                         {
-                            targetNode.OperationId = openListOperationId;
-                            targetNode.OperationParam = weightToNode;
-                            targetNode.SelectedEdge = edge;
+                            targetNode.operationId = openListOperationId;
+                            targetNode.operationParam = weightToNode;
+                            targetNode.selectedEdge = edge;
                             openNodeList.AddLast(targetNode);
                         }
-                        else if (targetNode.OperationId == openListOperationId)
+                        else if (targetNode.operationId == openListOperationId)
                         {
-                            if (targetNode.OperationParam > weightToNode)
+                            if (targetNode.operationParam > weightToNode)
                             {
-                                targetNode.OperationParam = weightToNode;
-                                targetNode.SelectedEdge = edge;
+                                targetNode.operationParam = weightToNode;
+                                targetNode.selectedEdge = edge;
                             }
                         }
                         //  end edge process
@@ -313,18 +313,18 @@ namespace Com.Bit34Games.Graph.Generic
             }
 
             //  Is end node reached
-            if (endNode.OperationId == closedListOperationId)
+            if (endNode.operationId == closedListOperationId)
             {
                 //  Init path
                 path.Init(startNode.Id, endNode.Id);
 
                 //  Backtrack edges from end to start
-                TEdge edge = (TEdge)endNode.SelectedEdge;
+                TEdge edge = (TEdge)endNode.selectedEdge;
 
                 do
                 {
                     path.Edges.AddFirst(edge);
-                    edge = (TEdge)_nodes[edge.SourceNodeId].SelectedEdge;
+                    edge = (TEdge)_nodes[edge.SourceNodeId].selectedEdge;
                 }
                 while (edge != null);
 
@@ -337,7 +337,7 @@ namespace Com.Bit34Games.Graph.Generic
 
         virtual protected float CalculateEdgeWeight(TNode sourceNode, TNode targetNode)
         {
-            return (targetNode.Position - sourceNode.Position).magnitude;
+            return (targetNode.position - sourceNode.position).magnitude;
         }
 
         private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)
@@ -347,7 +347,7 @@ namespace Com.Bit34Games.Graph.Generic
             LinkedListNode<TNode> current = lowest.Next;
             while (current != null)
             {
-                if (current.Value.OperationParam < lowest.Value.OperationParam)
+                if (current.Value.operationParam < lowest.Value.operationParam)
                 {
                     lowest = current;
                 }

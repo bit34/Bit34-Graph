@@ -2,22 +2,22 @@
 {
     public class GraphPathConfig
     {
-        //  TYPES
+        //  DELEGATES
         public delegate bool EdgeAgentDelegate(GraphEdge edge, GraphAgent agent);
 
 
         //  MEMBERS
-        public readonly bool              UseStaticEdges;
-        public readonly bool              UseDynamicEdges;
-        public readonly EdgeAgentDelegate IsEdgeAccessible;
+        public readonly bool              useStaticEdges;
+        public readonly bool              useDynamicEdges;
+        public readonly EdgeAgentDelegate isEdgeAccessible;
 
 
         //  CONSTRUCTOR(S)
         public GraphPathConfig(bool useStaticEdges=true, bool useDynamicEdges=true, EdgeAgentDelegate isEdgeAccessible=null)
         {
-            UseStaticEdges = useStaticEdges;
-            UseDynamicEdges = useDynamicEdges;
-            IsEdgeAccessible = isEdgeAccessible;
+            this.useStaticEdges   = useStaticEdges;
+            this.useDynamicEdges  = useDynamicEdges;
+            this.isEdgeAccessible = isEdgeAccessible;
         }
 
     }

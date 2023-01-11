@@ -6,26 +6,26 @@ namespace Com.Bit34Games.Graph.Generic
     public class GraphNodeGroup
     {
         //  MEMBERS
-        public int NodeCount { get { return _NodeIds.Count; } }
-        private HashSet<int> _NodeIds;
+        public int NodeCount { get { return _nodeIds.Count; } }
+        private HashSet<int> _nodeIds;
 
 
         //  CONSTRUCTORS
         public GraphNodeGroup()
         {
-            _NodeIds = new HashSet<int>();
+            _nodeIds = new HashSet<int>();
         }
 
 
         //  METHODS
         public void Add(int nodeId)
         {
-            _NodeIds.Add(nodeId);
+            _nodeIds.Add(nodeId);
         }
 
         public void Remove( int nodeId)
         {
-            _NodeIds.Remove(nodeId);
+            _nodeIds.Remove(nodeId);
         }
 
         public void Append(GraphNodeGroup group)
@@ -33,23 +33,23 @@ namespace Com.Bit34Games.Graph.Generic
             IEnumerator<int> nodeIds = group.GetEnumerator();
             while (nodeIds.MoveNext())
             {
-                _NodeIds.Add(nodeIds.Current);
+                _nodeIds.Add(nodeIds.Current);
             }
         }
 
         public bool Has(int nodeId)
         {
-            return _NodeIds.Contains(nodeId);
+            return _nodeIds.Contains(nodeId);
         }
 
         public void Clear()
         {
-            _NodeIds.Clear();
+            _nodeIds.Clear();
         }
 
         public IEnumerator<int> GetEnumerator()
         {
-            return _NodeIds.GetEnumerator();
+            return _nodeIds.GetEnumerator();
         }
 
     }

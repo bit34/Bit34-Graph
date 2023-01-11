@@ -3,15 +3,12 @@
     public class GraphEdge
     {
         //  MEMBERS
-        public int SourceNodeId { get; private set; }
-        public int SourceEdgeIndex { get; private set; }
-        public int TargetNodeId { get; private set; }
-        public int TargetEdgeIndex { get; private set; }
-        public float Weight { get; private set; }
+        public int       SourceNodeId { get; private set; }
+        public int       SourceEdgeIndex { get; private set; }
+        public int       TargetNodeId { get; private set; }
+        public int       TargetEdgeIndex { get; private set; }
+        public float     Weight { get; private set; }
         public GraphEdge OppositeEdge { get; private set; }
-        //      Internal
-        private object _Data;
-
 
 
         //  CONSTRUCTORS
@@ -23,16 +20,6 @@
         public void UpdateWeight(float weight)
         {
             Weight = weight;
-        }
-
-        public TData GetData<TData>()
-        {
-            return (TData)_Data;
-        }
-
-        internal void InitData(object data)
-        {
-            _Data = data;
         }
         
         internal void Set(int sourceNodeId, int sourceEdgeIndex, int targetNodeId, int targetEdgeIndex, float weight, GraphEdge oppositeEdge)

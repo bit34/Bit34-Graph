@@ -25,8 +25,8 @@ namespace Bit34.Graph.Utilities
                     
                     if(edge!=null)
                     {
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
+                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
                     }
                 }
             }
@@ -51,8 +51,8 @@ namespace Bit34.Graph.Utilities
                 {
                     GraphEdge edge = edges.Current;
                     
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
+                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
                 }
             }
 
@@ -71,8 +71,8 @@ namespace Bit34.Graph.Utilities
             {
                 GraphEdge edge = edges.Current;
 
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).Position ) );
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).Position ) );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
+                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
             }
 
             GL.End();

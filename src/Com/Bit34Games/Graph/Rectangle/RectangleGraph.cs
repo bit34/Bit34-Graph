@@ -5,8 +5,8 @@ using Com.Bit34Games.Graph.Grid;
 namespace Com.Bit34Games.Graph.Rectangle
 {
     public class RectangleGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
-        where TNode : GridGraphNode
-        where TEdge : GraphEdge
+        where TNode : RectangleGraphNode
+        where TEdge : RectangleGraphEdge
     {
         //  MEMBERS
         public readonly RectangleGraphConfig rectangleConfig;
@@ -35,12 +35,12 @@ namespace Com.Bit34Games.Graph.Rectangle
 
 
         //  METHODS
-        override public TNode GetNodeByLocation( int column, int row)
+        public TNode GetNodeByLocation( int column, int row)
         {
             return _nodes[column+(row*columnCount)];
         }
 
-        override public TNode TryGetNodeByLocation(int column, int row)
+        public TNode TryGetNodeByLocation(int column, int row)
         {
             if (column >= 0 && column < columnCount && row >= 0 && row < rowCount)
             {
@@ -59,7 +59,7 @@ namespace Com.Bit34Games.Graph.Rectangle
                 {
                     TNode node = CreateNode();
                     node.SetLocation(c, r);
-                    node.Position = rectangleConfig.GetNodePosition(c, r);
+                    node.position = rectangleConfig.GetNodePosition(c, r);
                     _nodes[columnCount*r+c] = node;
                 }
             }

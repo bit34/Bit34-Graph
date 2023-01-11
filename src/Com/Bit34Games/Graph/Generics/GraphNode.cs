@@ -9,45 +9,39 @@ namespace Com.Bit34Games.Graph.Generic
     {
         //  MEMBERS
         public int       Id { get; private set; }
-        public Vector3   Position;
-        public int       StaticEdgeCount  { get { return _StaticEdges.Length; } }
-        public int       DynamicEdgeCount { get { return _DynamicEdges.Count; } }
+        public Vector3   position;
+        public int       StaticEdgeCount  { get { return _staticEdges.Length; } }
+        public int       DynamicEdgeCount { get { return _dynamicEdges.Count; } }
         //      Internal
-        private object                _Data;
-        private GraphEdge[]           _StaticEdges;
-        private LinkedList<GraphEdge> _DynamicEdges;
+        private GraphEdge[]           _staticEdges;
+        private LinkedList<GraphEdge> _dynamicEdges;
         //      Fields for internal operations
-        internal object    OwnerGraph;
-        internal int       OperationId;
-        internal float     OperationParam;
-        internal GraphEdge SelectedEdge;
+        internal object    ownerGraph;
+        internal int       operationId;
+        internal float     operationParam;
+        internal GraphEdge selectedEdge;
 
 
         //  CONSTRUCTORS
         public GraphNode()
         {
-            OperationId = 0;
-            OperationParam = 0;
-            _DynamicEdges = new LinkedList<GraphEdge>();
+            operationId    = 0;
+            operationParam = 0;
+            _dynamicEdges  = new LinkedList<GraphEdge>();
         }
 
 
         //  METHODS
-        public TData GetData<TData>()
-        {
-            return (TData)_Data;
-        }
-
         public GraphEdge GetStaticEdge(int edgeIndex)
         {
-            return _StaticEdges[edgeIndex];
+            return _staticEdges[edgeIndex];
         }
 
         public bool HasStaticEdgeTo(int nodeId)
         {
-            for (int i = 0; i < _StaticEdges.Length; i++)
+            for (int i = 0; i < _staticEdges.Length; i++)
             {
-                if (_StaticEdges[i] != null && _StaticEdges[i].TargetNodeId == nodeId)
+                if (_staticEdges[i] != null && _staticEdges[i].TargetNodeId == nodeId)
                 {
                     return true;
                 }
@@ -57,11 +51,11 @@ namespace Com.Bit34Games.Graph.Generic
 
         public GraphEdge GetStaticEdgeTo(int nodeId)
         {
-            for (int i = 0; i < _StaticEdges.Length; i++)
+            for (int i = 0; i < _staticEdges.Length; i++)
             {
-                if (_StaticEdges[i] != null && _StaticEdges[i].TargetNodeId == nodeId)
+                if (_staticEdges[i] != null && _staticEdges[i].TargetNodeId == nodeId)
                 {
-                    return _StaticEdges[i];
+                    return _staticEdges[i];
                 }
             }
             return null;
@@ -69,12 +63,12 @@ namespace Com.Bit34Games.Graph.Generic
 
         public IEnumerator<GraphEdge> GetDynamicEdgeEnumerator()
         {
-            return _DynamicEdges.GetEnumerator();
+            return _dynamicEdges.GetEnumerator();
         }
 
         public bool HasDynamicEdgeTo(int nodeId)
         {
-            IEnumerator<GraphEdge> edges = _DynamicEdges.GetEnumerator();
+            IEnumerator<GraphEdge> edges = _dynamicEdges.GetEnumerator();
 
             while (edges.MoveNext() == true)
             {
@@ -88,7 +82,7 @@ namespace Com.Bit34Games.Graph.Generic
 
         public GraphEdge GetDynamicEdgeTo(int nodeId)
         {
-            IEnumerator<GraphEdge> edges = _DynamicEdges.GetEnumerator();
+            IEnumerator<GraphEdge> edges = _dynamicEdges.GetEnumerator();
 
             while (edges.MoveNext() == true)
             {
@@ -99,44 +93,39 @@ namespace Com.Bit34Games.Graph.Generic
             }
             return null;
         }
-
-        internal void InitData(object data)
-        {
-            _Data = data;
-        }
         
         internal void AddedToGraph(object ownerGraph, int id, int staticEdgeCount)
         {
-            OwnerGraph = ownerGraph;
+            this.ownerGraph = ownerGraph;
             Id = id;
-            _StaticEdges = new GraphEdge[staticEdgeCount];
+            _staticEdges = new GraphEdge[staticEdgeCount];
         }
 
         internal void RemovedFromGraph()
         {
-            OwnerGraph = null;
+            ownerGraph = null;
             Id = -1;
-            _StaticEdges = null;
+            _staticEdges = null;
         }
 
         internal void SetStaticEdge(int edgeIndex, GraphEdge edge)
         {
-            _StaticEdges[edgeIndex] = edge;
+            _staticEdges[edgeIndex] = edge;
         }
 
         internal void AddDynamicEdge(GraphEdge edge)
         {
-            _DynamicEdges.AddLast(edge);
+            _dynamicEdges.AddLast(edge);
         }
 
         internal void RemoveDynamicEdge(GraphEdge edge)
         {
-            _DynamicEdges.Remove(edge);
+            _dynamicEdges.Remove(edge);
         }
 
         internal GraphEdge GetFirstDynamicEdge()
         {
-            return _DynamicEdges.First.Value;
+            return _dynamicEdges.First.Value;
         }
 
     }
