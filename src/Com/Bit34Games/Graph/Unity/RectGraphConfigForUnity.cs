@@ -1,10 +1,9 @@
 using UnityEngine;
-using Com.Bit34Games.Graph.Rectangle;
 using Com.Bit34Games.Graph.Generic;
 
 namespace Com.Bit34Games.Graph.Unity
 {
-    public class RectangleGraphConfigForUnity : RectangleGraphConfig
+    public class RectGraphConfigForUnity : RectGraphConfig
     {
         //  MEMBERS
         public readonly Vector3 xAxis;
@@ -12,11 +11,11 @@ namespace Com.Bit34Games.Graph.Unity
 
 
         //  CONSTRUCTORS
-        public RectangleGraphConfigForUnity(Vector3 xAxis,
-                                            Vector3 yAxis,
-                                            bool    isYAxisUp = false,
-                                            bool    hasStraightEdges = true,
-                                            bool    hasDiagonalEdges = false) : 
+        public RectGraphConfigForUnity(Vector3 xAxis,
+                                       Vector3 yAxis,
+                                       bool    isYAxisUp = false,
+                                       bool    hasStraightEdges = true,
+                                       bool    hasDiagonalEdges = false) : 
             base(isYAxisUp,
                  hasStraightEdges,
                  hasDiagonalEdges)
@@ -27,14 +26,14 @@ namespace Com.Bit34Games.Graph.Unity
 
         override public float CalculateEdgeWeight(GraphNode sourceNode, GraphNode targetNode)
         {
-            RectangleGraphNodeForUnity castedSourceNode = (RectangleGraphNodeForUnity)sourceNode;
-            RectangleGraphNodeForUnity castedTargetNode = (RectangleGraphNodeForUnity)targetNode;
+            RectGraphNodeForUnity castedSourceNode = (RectGraphNodeForUnity)sourceNode;
+            RectGraphNodeForUnity castedTargetNode = (RectGraphNodeForUnity)targetNode;
             return (castedTargetNode.position - castedSourceNode.position).magnitude;
         }
 
-        override public void InitializeNode(RectangleGraphNode node, int column, int row)
+        override public void InitializeNode(RectGraphNode node, int column, int row)
         {
-            RectangleGraphNodeForUnity castedNode = (RectangleGraphNodeForUnity)node;
+            RectGraphNodeForUnity castedNode = (RectGraphNodeForUnity)node;
             castedNode.position = GetNodePosition(column, row);
         }
 

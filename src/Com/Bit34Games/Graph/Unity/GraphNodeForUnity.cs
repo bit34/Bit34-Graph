@@ -1,5 +1,5 @@
-using Com.Bit34Games.Graph.Generic;
 using UnityEngine;
+using Com.Bit34Games.Graph.Generic;
 
 
 namespace Com.Bit34Games.Graph.Unity

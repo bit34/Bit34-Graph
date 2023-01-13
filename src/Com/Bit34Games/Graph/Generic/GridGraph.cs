@@ -1,7 +1,4 @@
-﻿using Com.Bit34Games.Graph.Generic;
-
-
-namespace Com.Bit34Games.Graph.Grid
+﻿namespace Com.Bit34Games.Graph.Generic
 {
     public abstract class GridGraph<TConfig, TNode, TEdge> : Graph<TConfig, TNode, TEdge>
         where TConfig : GridGraphConfig

@@ -1,13 +1,9 @@
-﻿using Com.Bit34Games.Graph.Generic;
-using Com.Bit34Games.Graph.Grid;
-
-
-namespace Com.Bit34Games.Graph.Rectangle
+﻿namespace Com.Bit34Games.Graph.Generic
 {
-    public class RectangleGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
-        where TConfig : RectangleGraphConfig
-        where TNode : RectangleGraphNode
-        where TEdge : RectangleGraphEdge
+    public class RectGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
+        where TConfig : RectGraphConfig
+        where TNode : RectGraphNode
+        where TEdge : RectGraphEdge
     {
         //  MEMBERS
         public readonly int columnCount;
@@ -17,14 +13,14 @@ namespace Com.Bit34Games.Graph.Rectangle
 
 
         //  CONSTRUCTOR(S)
-        public RectangleGraph(TConfig                       config,
-                              IGraphAllocator<TNode, TEdge> allocator,
-                              int                           columnCount,
-                              int                           rowCount) :
+        public RectGraph(TConfig                       config,
+                         IGraphAllocator<TNode, TEdge> allocator,
+                         int                           columnCount,
+                         int                           rowCount) :
             base(config, allocator)
         {
-            this.columnCount     = columnCount;
-            this.rowCount        = rowCount;
+            this.columnCount = columnCount;
+            this.rowCount    = rowCount;
 
             CreateNodes();
             CreateEdges();
@@ -79,10 +75,10 @@ namespace Com.Bit34Games.Graph.Rectangle
 
         private void CreateStraightEdges()
         {
-            int horizontalEdge = (int)RectangleGraphEdges.RIGHT;
+            int horizontalEdge         = (int)RectangleGraphEdges.RIGHT;
             int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);
 
-            int verticalEdge = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
+            int verticalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
             int verticalOppositeEdge = GetOppositeEdge(verticalEdge);
 
             for (int c = 0; c < columnCount; c++)

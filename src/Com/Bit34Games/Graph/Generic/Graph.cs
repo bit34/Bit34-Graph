@@ -23,7 +23,7 @@ namespace Com.Bit34Games.Graph.Generic
         public Graph(TConfig config, IGraphAllocator<TNode, TEdge> allocator)
         {
             IsFixed        = false;
-            Config        = config;
+            Config         = config;
             _allocator     = allocator;
             _nodes         = new Dictionary<int, TNode>();
             _nodeIdCounter = 0;

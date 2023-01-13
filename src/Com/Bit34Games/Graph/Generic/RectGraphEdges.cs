@@ -1,4 +1,4 @@
-﻿namespace Com.Bit34Games.Graph.Rectangle
+﻿namespace Com.Bit34Games.Graph.Generic
 {
     public enum RectangleGraphEdges
     {

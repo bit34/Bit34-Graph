@@ -1,9 +1,6 @@
-using Com.Bit34Games.Graph.Grid;
-
-
-namespace Com.Bit34Games.Graph.Rectangle
+namespace Com.Bit34Games.Graph.Generic
 {
-    public class RectangleGraphNode : GridGraphNode
+    public class RectGraphNode : GridGraphNode
     {
         //  MEMBERS
         public int Column { get; private set; }
@@ -11,7 +8,7 @@ namespace Com.Bit34Games.Graph.Rectangle
 
 
         //  CONSTRUCTORS
-        public RectangleGraphNode() {}
+        public RectGraphNode() {}
 
 
         //  METHODS   
