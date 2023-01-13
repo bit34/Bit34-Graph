@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Com.Bit34Games.Graph.Generic;
 
-
-namespace Bit34.Graph.Utilities
+namespace Com.Bit34Games.Graph.Unity
 {
-    public static class GraphUtilities
+    public static class GraphUtilitiesForUnity
     {
-        static public void DrawStaticEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
-            where TNode : GraphNode
+        static public void DrawStaticEdges<TConfig, TNode, TEdge>(Graph<TConfig, TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
+            where TConfig : GraphConfig
+            where TNode : GraphNode, IGraphNodeForUnity
             where TEdge : GraphEdge
         {
             edgeMaterial.SetPass(0);
@@ -25,8 +25,7 @@ namespace Bit34.Graph.Utilities
                     
                     if(edge!=null)
                     {
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
-                        GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
+                        DrawEdge(graph, edge, matrix);
                     }
                 }
             }
@@ -34,8 +33,9 @@ namespace Bit34.Graph.Utilities
             GL.End();
         }
 
-        static public void DrawDynamicEdges<TNode, TEdge>(Graph<TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
-            where TNode : GraphNode
+        static public void DrawDynamicEdges<TConfig, TNode, TEdge>(Graph<TConfig, TNode, TEdge> graph, Material edgeMaterial, Matrix4x4 matrix)
+            where TConfig : GraphConfig
+            where TNode : GraphNode, IGraphNodeForUnity
             where TEdge : GraphEdge
         {
             edgeMaterial.SetPass(0);
@@ -49,18 +49,16 @@ namespace Bit34.Graph.Utilities
                 IEnumerator<GraphEdge>edges = node.GetDynamicEdgeEnumerator();
                 while(edges.MoveNext())
                 {
-                    GraphEdge edge = edges.Current;
-                    
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
-                    GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
+                    DrawEdge(graph, edges.Current, matrix);
                 }
             }
 
             GL.End();
         }
 
-        static public void DrawPath<TNode, TEdge>(Graph<TNode, TEdge> graph, GraphPath path, Material edgeMaterial, Matrix4x4 matrix)
-            where TNode : GraphNode
+        static public void DrawPath<TConfig, TNode, TEdge>(Graph<TConfig, TNode, TEdge> graph, GraphPath path, Material edgeMaterial, Matrix4x4 matrix)
+            where TConfig : GraphConfig
+            where TNode : GraphNode, IGraphNodeForUnity
             where TEdge : GraphEdge
         {
             edgeMaterial.SetPass(0);
@@ -69,13 +67,19 @@ namespace Bit34.Graph.Utilities
             IEnumerator<GraphEdge> edges = path.Edges.GetEnumerator();
             while (edges.MoveNext() == true)
             {
-                GraphEdge edge = edges.Current;
-
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).position ) );
-                GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).position ) );
+                DrawEdge(graph, edges.Current, matrix);
             }
 
             GL.End();
+        }
+
+        static private void DrawEdge<TConfig, TNode, TEdge>(Graph<TConfig, TNode, TEdge> graph, GraphEdge edge, Matrix4x4 matrix)
+            where TConfig : GraphConfig
+            where TNode : GraphNode, IGraphNodeForUnity
+            where TEdge : GraphEdge
+        {
+            GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.SourceNodeId).GetPosition() ) );
+            GL.Vertex( matrix.MultiplyPoint( graph.GetNode(edge.TargetNodeId).GetPosition() ) );
         }
     }
 }

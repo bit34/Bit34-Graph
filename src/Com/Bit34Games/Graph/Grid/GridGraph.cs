@@ -3,26 +3,21 @@
 
 namespace Com.Bit34Games.Graph.Grid
 {
-    public abstract class GridGraph<TNode, TEdge> : Graph<TNode, TEdge>
+    public abstract class GridGraph<TConfig, TNode, TEdge> : Graph<TConfig, TNode, TEdge>
+        where TConfig : GridGraphConfig
         where TNode : GridGraphNode
         where TEdge : GridGraphEdge
     {
-        //  MEMBERS
-        private readonly GridGraphConfig _gridConfig;
-
-
         //  CONSTRUCTORS
-        public GridGraph(GridGraphConfig gridConfig, IGraphAllocator<TNode, TEdge> allocator) :
-            base(gridConfig, allocator)
-        {
-            _gridConfig = gridConfig;
-        }
+        public GridGraph(TConfig config, IGraphAllocator<TNode, TEdge> allocator) :
+            base(config, allocator)
+        {}
 
 
         //  METHODS
         public int GetOppositeEdge(int edge)
         {
-            return (edge + (_gridConfig.staticEdgeCount / 2)) % _gridConfig.staticEdgeCount;
+            return (edge + (Config.staticEdgeCount / 2)) % Config.staticEdgeCount;
         }
 
     }

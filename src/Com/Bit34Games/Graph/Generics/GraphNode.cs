@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace Com.Bit34Games.Graph.Generic
@@ -8,8 +7,7 @@ namespace Com.Bit34Games.Graph.Generic
     public class GraphNode
     {
         //  MEMBERS
-        public int       Id { get; private set; }
-        public Vector3   position;
+        public int       Id               { get; private set; }
         public int       StaticEdgeCount  { get { return _staticEdges.Length; } }
         public int       DynamicEdgeCount { get { return _dynamicEdges.Count; } }
         //      Internal
@@ -25,9 +23,9 @@ namespace Com.Bit34Games.Graph.Generic
         //  CONSTRUCTORS
         public GraphNode()
         {
+            _dynamicEdges  = new LinkedList<GraphEdge>();
             operationId    = 0;
             operationParam = 0;
-            _dynamicEdges  = new LinkedList<GraphEdge>();
         }
 
 

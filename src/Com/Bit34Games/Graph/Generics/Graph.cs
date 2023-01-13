@@ -4,28 +4,29 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graph.Generic
 {
-    public class Graph<TNode, TEdge>
+    public class Graph<TConfig, TNode, TEdge>
+        where TConfig : GraphConfig
         where TNode : GraphNode
         where TEdge : GraphEdge
     {
         //	MEMBERS
         public bool IsFixed { get; protected set; }
+        public readonly TConfig Config;
         //      Internal
-        private readonly GraphConfig          _config;
-        private IGraphAllocator<TNode, TEdge> _allocator;
-        private int                           _nodeIdCounter;
-        private Dictionary<int, TNode>        _nodes;
-        private int                           _operationId;
+        private readonly IGraphAllocator<TNode, TEdge> _allocator;
+        private readonly Dictionary<int, TNode>        _nodes;
+        private int                                    _nodeIdCounter;
+        private int                                    _operationId;
 
 
         //  CONSTRUCTORS
-        public Graph(GraphConfig config, IGraphAllocator<TNode, TEdge> allocator)
+        public Graph(TConfig config, IGraphAllocator<TNode, TEdge> allocator)
         {
             IsFixed        = false;
-            _config        = config;
+            Config        = config;
             _allocator     = allocator;
-            _nodeIdCounter = 0;
             _nodes         = new Dictionary<int, TNode>();
+            _nodeIdCounter = 0;
             _operationId   = 0;
         }
 
@@ -39,7 +40,7 @@ namespace Com.Bit34Games.Graph.Generic
             }
 
             TNode node = _allocator.CreateNode();
-            node.AddedToGraph(this, _nodeIdCounter++, _config.staticEdgeCount);
+            node.AddedToGraph(this, _nodeIdCounter++, Config.staticEdgeCount);
             _nodes.Add(node.Id, node);
 
             return node;
@@ -132,7 +133,7 @@ namespace Com.Bit34Games.Graph.Generic
             }
 
             //  Set edge connections
-            edge.Set(source.Id, sourceEdgeIndex, target.Id, targetEdgeIndex, CalculateEdgeWeight(source, target), oppositeEdge);
+            edge.Set(source.Id, sourceEdgeIndex, target.Id, targetEdgeIndex, Config.CalculateEdgeWeight(source, target), oppositeEdge);
 
             if (sourceEdgeIndex == -1)
             {
@@ -150,7 +151,7 @@ namespace Com.Bit34Games.Graph.Generic
             //  Set opposite edge connections
             if (createOpposite)
             {
-                oppositeEdge.Set(target.Id, targetEdgeIndex, source.Id, sourceEdgeIndex, CalculateEdgeWeight(target, source), edge);
+                oppositeEdge.Set(target.Id, targetEdgeIndex, source.Id, sourceEdgeIndex, Config.CalculateEdgeWeight(target, source), edge);
 
                 if (targetEdgeIndex == -1)
                 {
@@ -333,11 +334,6 @@ namespace Com.Bit34Games.Graph.Generic
 
             //  No valid path
             return false;
-        }
-
-        virtual protected float CalculateEdgeWeight(TNode sourceNode, TNode targetNode)
-        {
-            return (targetNode.position - sourceNode.position).magnitude;
         }
 
         private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)

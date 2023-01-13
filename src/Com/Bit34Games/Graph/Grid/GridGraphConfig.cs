@@ -1,5 +1,4 @@
 ﻿using Com.Bit34Games.Graph.Generic;
-using UnityEngine;
 
 
 namespace Com.Bit34Games.Graph.Grid
@@ -10,9 +9,5 @@ namespace Com.Bit34Games.Graph.Grid
         public GridGraphConfig(int staticEdgeCount) : 
             base(staticEdgeCount)
         {}
-
-
-        //  METHODS
-        public abstract Vector3 GetNodePosition(int column, int row);
     }
 }

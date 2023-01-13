@@ -4,26 +4,25 @@ using Com.Bit34Games.Graph.Grid;
 
 namespace Com.Bit34Games.Graph.Rectangle
 {
-    public class RectangleGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
+    public class RectangleGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
+        where TConfig : RectangleGraphConfig
         where TNode : RectangleGraphNode
         where TEdge : RectangleGraphEdge
     {
         //  MEMBERS
-        public readonly RectangleGraphConfig rectangleConfig;
-        public readonly int                  columnCount;
-        public readonly int                  rowCount;
+        public readonly int columnCount;
+        public readonly int rowCount;
         //      Internal
         private TNode[] _nodes;
 
 
         //  CONSTRUCTOR(S)
-        public RectangleGraph(RectangleGraphConfig          rectangleConfig,
+        public RectangleGraph(TConfig                       config,
                               IGraphAllocator<TNode, TEdge> allocator,
                               int                           columnCount,
                               int                           rowCount) :
-            base(rectangleConfig, allocator)
+            base(config, allocator)
         {
-            this.rectangleConfig = rectangleConfig;
             this.columnCount     = columnCount;
             this.rowCount        = rowCount;
 
@@ -59,7 +58,7 @@ namespace Com.Bit34Games.Graph.Rectangle
                 {
                     TNode node = CreateNode();
                     node.SetLocation(c, r);
-                    node.position = rectangleConfig.GetNodePosition(c, r);
+                    Config.InitializeNode(node, c, r);
                     _nodes[columnCount*r+c] = node;
                 }
             }
@@ -67,12 +66,12 @@ namespace Com.Bit34Games.Graph.Rectangle
 
         private void CreateEdges()
         {
-            if (rectangleConfig.hasStraightEdges == true)
+            if (Config.hasStraightEdges == true)
             {
                 CreateStraightEdges();
             }
 
-            if (rectangleConfig.hasDiagonalEdges == true)
+            if (Config.hasDiagonalEdges == true)
             {
                 CreateDiagonalEdges();
             }
@@ -83,7 +82,7 @@ namespace Com.Bit34Games.Graph.Rectangle
             int horizontalEdge = (int)RectangleGraphEdges.RIGHT;
             int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);
 
-            int verticalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
+            int verticalEdge = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
             int verticalOppositeEdge = GetOppositeEdge(verticalEdge);
 
             for (int c = 0; c < columnCount; c++)
@@ -105,10 +104,10 @@ namespace Com.Bit34Games.Graph.Rectangle
 
         private void CreateDiagonalEdges()
         {
-            int rightDiagonalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.RIGHT_UP) : ((int)RectangleGraphEdges.RIGHT_DOWN);
+            int rightDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.RIGHT_UP) : ((int)RectangleGraphEdges.RIGHT_DOWN);
             int rightDiagonalOppositeEdge = GetOppositeEdge(rightDiagonalEdge);
 
-            int leftDiagonalEdge = (rectangleConfig.isYAxisUp) ? ((int)RectangleGraphEdges.LEFT_UP) : ((int)RectangleGraphEdges.LEFT_DOWN);
+            int leftDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.LEFT_UP) : ((int)RectangleGraphEdges.LEFT_DOWN);
             int leftDiagonalOppositeEdge = GetOppositeEdge(leftDiagonalEdge);
 
             for (int c = 0; c < columnCount; c++)
