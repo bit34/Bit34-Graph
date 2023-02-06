@@ -7,123 +7,97 @@ namespace Com.Bit34Games.Graphs
     public class GraphNode
     {
         //  MEMBERS
-        public int       Id               { get; private set; }
-        public int       StaticEdgeCount  { get { return _staticEdges.Length; } }
-        public int       DynamicEdgeCount { get { return _dynamicEdges.Count; } }
+        public int Id                     { get; private set; }
+        public int StaticConnectionCount  { get { return _staticConnections.Length; } }
+        public int DynamicConnectionCount { get { return _dynamicConnections.Count; } }
         //      Internal
-        private GraphEdge[]           _staticEdges;
-        private LinkedList<GraphEdge> _dynamicEdges;
+        private GraphConnection[]           _staticConnections;
+        private LinkedList<GraphConnection> _dynamicConnections;
         //      Fields for internal operations
-        internal object    ownerGraph;
-        internal int       operationId;
-        internal float     operationParam;
-        internal GraphEdge selectedEdge;
+        internal object          ownerGraph;
+        internal int             operationId;
+        internal float           operationParam;
+        internal GraphConnection selectedConnection;
 
 
         //  CONSTRUCTORS
         public GraphNode()
         {
-            _dynamicEdges  = new LinkedList<GraphEdge>();
-            operationId    = 0;
-            operationParam = 0;
+            _dynamicConnections = new LinkedList<GraphConnection>();
+            operationId         = 0;
+            operationParam      = 0;
         }
 
 
         //  METHODS
-        public GraphEdge GetStaticEdge(int edgeIndex)
+        public GraphConnection GetStaticConnection(int connectionIndex)
         {
-            return _staticEdges[edgeIndex];
+            return _staticConnections[connectionIndex];
         }
 
-        public bool HasStaticEdgeTo(int nodeId)
+        public GraphConnection GetStaticConnectionTo(int nodeId)
         {
-            for (int i = 0; i < _staticEdges.Length; i++)
+            for (int i = 0; i < _staticConnections.Length; i++)
             {
-                if (_staticEdges[i] != null && _staticEdges[i].TargetNodeId == nodeId)
+                if (_staticConnections[i] != null && _staticConnections[i].TargetNodeId == nodeId)
                 {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public GraphEdge GetStaticEdgeTo(int nodeId)
-        {
-            for (int i = 0; i < _staticEdges.Length; i++)
-            {
-                if (_staticEdges[i] != null && _staticEdges[i].TargetNodeId == nodeId)
-                {
-                    return _staticEdges[i];
+                    return _staticConnections[i];
                 }
             }
             return null;
         }
 
-        public IEnumerator<GraphEdge> GetDynamicEdgeEnumerator()
+        public IEnumerator<GraphConnection> GetDynamicConnectionEnumerator()
         {
-            return _dynamicEdges.GetEnumerator();
+            return _dynamicConnections.GetEnumerator();
         }
 
-        public bool HasDynamicEdgeTo(int nodeId)
+        public GraphConnection GetDynamicConnectionTo(int nodeId)
         {
-            IEnumerator<GraphEdge> edges = _dynamicEdges.GetEnumerator();
+            IEnumerator<GraphConnection> connections = _dynamicConnections.GetEnumerator();
 
-            while (edges.MoveNext() == true)
+            while (connections.MoveNext() == true)
             {
-                if (edges.Current.TargetNodeId == nodeId)
+                if (connections.Current.TargetNodeId == nodeId)
                 {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public GraphEdge GetDynamicEdgeTo(int nodeId)
-        {
-            IEnumerator<GraphEdge> edges = _dynamicEdges.GetEnumerator();
-
-            while (edges.MoveNext() == true)
-            {
-                if (edges.Current.TargetNodeId == nodeId)
-                {
-                    return edges.Current;
+                    return connections.Current;
                 }
             }
             return null;
         }
         
-        internal void AddedToGraph(object ownerGraph, int id, int staticEdgeCount)
+        internal void AddedToGraph(object ownerGraph, int id, int staticConnectionCount)
         {
-            this.ownerGraph = ownerGraph;
-            Id = id;
-            _staticEdges = new GraphEdge[staticEdgeCount];
+            this.ownerGraph    = ownerGraph;
+            Id                 = id;
+            _staticConnections = new GraphConnection[staticConnectionCount];
         }
 
         internal void RemovedFromGraph()
         {
-            ownerGraph = null;
-            Id = -1;
-            _staticEdges = null;
+            ownerGraph         = null;
+            Id                 = -1;
+            _staticConnections = null;
         }
 
-        internal void SetStaticEdge(int edgeIndex, GraphEdge edge)
+        internal void SetStaticConnection(int connectionIndex, GraphConnection connection)
         {
-            _staticEdges[edgeIndex] = edge;
+            _staticConnections[connectionIndex] = connection;
         }
 
-        internal void AddDynamicEdge(GraphEdge edge)
+        internal void AddDynamicConnection(GraphConnection connection)
         {
-            _dynamicEdges.AddLast(edge);
+            _dynamicConnections.AddLast(connection);
         }
 
-        internal void RemoveDynamicEdge(GraphEdge edge)
+        internal void RemoveDynamicConnection(GraphConnection connection)
         {
-            _dynamicEdges.Remove(edge);
+            _dynamicConnections.Remove(connection);
         }
 
-        internal GraphEdge GetFirstDynamicEdge()
+        internal GraphConnection GetFirstDynamicConnection()
         {
-            return _dynamicEdges.First.Value;
+            return _dynamicConnections.First.Value;
         }
 
     }

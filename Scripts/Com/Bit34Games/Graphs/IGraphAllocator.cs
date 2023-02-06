@@ -2,11 +2,11 @@
 {
     public interface IGraphAllocator<TNode, TEdge>
         where TNode : GraphNode
-        where TEdge : GraphEdge
+        where TEdge : GraphConnection
     {
         TNode CreateNode();
-        TEdge CreateEdge();
+        TEdge CreateConnection();
         void  FreeNode(TNode node);
-        void  FreeEdge(TEdge edge);
+        void  FreeConnection(TEdge edge);
     }
 }

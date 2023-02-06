@@ -1,22 +1,23 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public abstract class RectGraphConfig : GridGraphConfig
+    public abstract class RectGraphConfig<TNode> : GridGraphConfig<TNode>
+        where TNode : RectGraphNode
     {
         //  MEMBERS
         public readonly bool isYAxisUp;
-        public readonly bool hasStraightEdges;
-        public readonly bool hasDiagonalEdges;
+        public readonly bool hasStraightConnections;
+        public readonly bool hasDiagonalConnections;
 
 
         //  CONSTRUCTORS
         public RectGraphConfig(bool isYAxisUp,
-                               bool hasStraightEdges,
-                               bool hasDiagonalEdges) : 
+                               bool hasStraightConnections,
+                               bool hasDiagonalConnections) : 
             base(8)
         {
             this.isYAxisUp        = isYAxisUp;
-            this.hasStraightEdges = hasStraightEdges;
-            this.hasDiagonalEdges = hasDiagonalEdges;
+            this.hasStraightConnections = hasStraightConnections;
+            this.hasDiagonalConnections = hasDiagonalConnections;
         }
 
         //  METHODS

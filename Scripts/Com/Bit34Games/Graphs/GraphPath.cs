@@ -8,13 +8,13 @@ namespace Com.Bit34Games.Graphs
         //  MEMBERS
         public int StartNodeId { get; private set; }
         public int EndNodeId { get; private set; }
-        public LinkedList<GraphEdge> Edges { get; private set; }
+        public LinkedList<GraphConnection> Connections { get; private set; }
 
 
         //  CONSTRUCTOR(S)
         public GraphPath()
         {
-            Edges = new LinkedList<GraphEdge>();
+            Connections = new LinkedList<GraphConnection>();
         }
 
 
@@ -23,7 +23,7 @@ namespace Com.Bit34Games.Graphs
         {
             StartNodeId = startNodeId;
             EndNodeId   = endNodeId;
-            Edges.Clear();
+            Connections.Clear();
         }
 
     }

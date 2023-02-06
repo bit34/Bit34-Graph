@@ -1,6 +1,6 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public enum RectangleGraphEdges
+    public enum RectGraphConnections
     {
         RIGHT,
         RIGHT_DOWN,

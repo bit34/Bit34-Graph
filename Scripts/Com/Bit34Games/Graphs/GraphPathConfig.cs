@@ -3,21 +3,23 @@
     public class GraphPathConfig
     {
         //  DELEGATES
-        public delegate bool EdgeAgentDelegate(GraphEdge edge, GraphAgent agent);
+        public delegate bool ConnectionAgentDelegate(GraphConnection edge, GraphAgent agent);
 
 
         //  MEMBERS
-        public readonly bool              useStaticEdges;
-        public readonly bool              useDynamicEdges;
-        public readonly EdgeAgentDelegate isEdgeAccessible;
+        public readonly bool                    useStaticConnections;
+        public readonly bool                    useDynamicConnections;
+        public readonly ConnectionAgentDelegate isConnectionAccessible;
 
 
         //  CONSTRUCTOR(S)
-        public GraphPathConfig(bool useStaticEdges=true, bool useDynamicEdges=true, EdgeAgentDelegate isEdgeAccessible=null)
+        public GraphPathConfig(bool                    useStaticConnections=true, 
+                               bool                    useDynamicConnections=true, 
+                               ConnectionAgentDelegate isConnectionAccessible=null)
         {
-            this.useStaticEdges   = useStaticEdges;
-            this.useDynamicEdges  = useDynamicEdges;
-            this.isEdgeAccessible = isEdgeAccessible;
+            this.useStaticConnections   = useStaticConnections;
+            this.useDynamicConnections  = useDynamicConnections;
+            this.isConnectionAccessible = isConnectionAccessible;
         }
 
     }

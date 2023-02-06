@@ -1,9 +1,9 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class RectGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
-        where TConfig : RectGraphConfig
+    public class RectGraph<TConfig, TNode, TConnection> : GridGraph<TConfig, TNode, TConnection>
+        where TConfig : RectGraphConfig<TNode>
         where TNode : RectGraphNode
-        where TEdge : RectGraphEdge
+        where TConnection : RectGraphConnection
     {
         //  MEMBERS
         public readonly int columnCount;
@@ -13,17 +13,17 @@
 
 
         //  CONSTRUCTOR(S)
-        public RectGraph(TConfig                       config,
-                         IGraphAllocator<TNode, TEdge> allocator,
-                         int                           columnCount,
-                         int                           rowCount) :
+        public RectGraph(TConfig                             config,
+                         IGraphAllocator<TNode, TConnection> allocator,
+                         int                                 columnCount,
+                         int                                 rowCount) :
             base(config, allocator)
         {
             this.columnCount = columnCount;
             this.rowCount    = rowCount;
 
             CreateNodes();
-            CreateEdges();
+            CreateConnections();
 
             IsFixed = true;
         }
@@ -52,7 +52,7 @@
             {
                 for (int r = 0; r < rowCount; r++)
                 {
-                    TNode node = CreateNode();
+                    TNode node = AddNode();
                     node.SetLocation(c, r);
                     Config.InitializeNode(node, c, r);
                     _nodes[columnCount*r+c] = node;
@@ -60,26 +60,26 @@
             }
         }
 
-        private void CreateEdges()
+        private void CreateConnections()
         {
-            if (Config.hasStraightEdges == true)
+            if (Config.hasStraightConnections == true)
             {
-                CreateStraightEdges();
+                CreateStraightConnections();
             }
 
-            if (Config.hasDiagonalEdges == true)
+            if (Config.hasDiagonalConnections == true)
             {
-                CreateDiagonalEdges();
+                CreateDiagonalConnections();
             }
         }
 
-        private void CreateStraightEdges()
+        private void CreateStraightConnections()
         {
-            int horizontalEdge         = (int)RectangleGraphEdges.RIGHT;
-            int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);
+            int horizontalConnection         = (int)RectGraphConnections.RIGHT;
+            int horizontalOppositeConnection = GetOppositeConnection(horizontalConnection);
 
-            int verticalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.UP) : ((int)RectangleGraphEdges.DOWN);
-            int verticalOppositeEdge = GetOppositeEdge(verticalEdge);
+            int verticalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.UP) : ((int)RectGraphConnections.DOWN);
+            int verticalOppositeConnection = GetOppositeConnection(verticalConnection);
 
             for (int c = 0; c < columnCount; c++)
             {
@@ -87,24 +87,24 @@
                 {
                     if (c < columnCount - 1)
                     {
-                        CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r), horizontalEdge, horizontalOppositeEdge, true);
+                        AddConnection(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r), horizontalConnection, horizontalOppositeConnection, true);
                     }
 
                     if (r < rowCount - 1)
                     {
-                        CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c, r + 1), verticalEdge, verticalOppositeEdge, true);
+                        AddConnection(GetNodeByLocation(c, r), GetNodeByLocation(c, r + 1), verticalConnection, verticalOppositeConnection, true);
                     }
                 }
             }
         }
 
-        private void CreateDiagonalEdges()
+        private void CreateDiagonalConnections()
         {
-            int rightDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.RIGHT_UP) : ((int)RectangleGraphEdges.RIGHT_DOWN);
-            int rightDiagonalOppositeEdge = GetOppositeEdge(rightDiagonalEdge);
+            int rightDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.RIGHT_UP) : ((int)RectGraphConnections.RIGHT_DOWN);
+            int rightDiagonalOppositeConnection = GetOppositeConnection(rightDiagonalConnection);
 
-            int leftDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectangleGraphEdges.LEFT_UP) : ((int)RectangleGraphEdges.LEFT_DOWN);
-            int leftDiagonalOppositeEdge = GetOppositeEdge(leftDiagonalEdge);
+            int leftDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.LEFT_UP) : ((int)RectGraphConnections.LEFT_DOWN);
+            int leftDiagonalOppositeConnection = GetOppositeConnection(leftDiagonalConnection);
 
             for (int c = 0; c < columnCount; c++)
             {
@@ -112,12 +112,12 @@
                 {
                     if (c < columnCount - 1 && r < rowCount - 1)
                     {
-                        CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r + 1), rightDiagonalEdge, rightDiagonalOppositeEdge, true);
+                        AddConnection(GetNodeByLocation(c, r), GetNodeByLocation(c + 1, r + 1), rightDiagonalConnection, rightDiagonalOppositeConnection, true);
                     }
 
                     if (c > 0 && r < rowCount - 1)
                     {
-                        CreateEdge(GetNodeByLocation(c, r), GetNodeByLocation(c - 1, r + 1), leftDiagonalEdge, leftDiagonalOppositeEdge, true);
+                        AddConnection(GetNodeByLocation(c, r), GetNodeByLocation(c - 1, r + 1), leftDiagonalConnection, leftDiagonalOppositeConnection, true);
                     }
                 }
             }
