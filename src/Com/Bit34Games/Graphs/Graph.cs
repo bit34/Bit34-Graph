@@ -14,7 +14,7 @@ namespace Com.Bit34Games.Graphs
         public int  NodeIdCounter { get; private set; }
         public bool IsFixed       { get; protected set; }
         public readonly TConfig Config;
-        //      Internal
+        //      Private
         private readonly IGraphAllocator<TNode, TConnection> _allocator;
         private readonly Dictionary<int, TNode>              _nodes;
         private int                                          _operationId;

@@ -3,11 +3,11 @@
     public class GraphConnection
     {
         //  MEMBERS
-        public int SourceNodeId { get; private set; }
-        public int SourceConnectionIndex { get; private set; }
-        public int TargetNodeId { get; private set; }
-        public int TargetConnectionIndex { get; private set; }
-        public float Weight { get; private set; }
+        public int             SourceNodeId { get; private set; }
+        public int             SourceConnectionIndex { get; private set; }
+        public int             TargetNodeId { get; private set; }
+        public int             TargetConnectionIndex { get; private set; }
+        public float           Weight { get; private set; }
         public GraphConnection Opposite { get; private set; }
 
 
