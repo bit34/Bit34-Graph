@@ -12,9 +12,9 @@
 
 
         //  METHODS
-        public int GetOppositeConnection(int edge)
+        public int GetOppositeConnection(int connection)
         {
-            return (edge + (Config.staticConnectionCount / 2)) % Config.staticConnectionCount;
+            return (connection + (Config.staticConnectionCount / 2)) % Config.staticConnectionCount;
         }
 
     }

@@ -1,12 +1,12 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public interface IGraphAllocator<TNode, TEdge>
+    public interface IGraphAllocator<TNode, TConnection>
         where TNode : GraphNode
-        where TEdge : GraphConnection
+        where TConnection : GraphConnection
     {
         TNode CreateNode();
-        TEdge CreateConnection();
+        TConnection CreateConnection();
         void  FreeNode(TNode node);
-        void  FreeConnection(TEdge edge);
+        void  FreeConnection(TConnection connection);
     }
 }

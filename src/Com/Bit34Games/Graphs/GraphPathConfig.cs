@@ -3,7 +3,7 @@
     public class GraphPathConfig
     {
         //  DELEGATES
-        public delegate bool ConnectionAgentDelegate(GraphConnection edge, GraphAgent agent);
+        public delegate bool ConnectionAgentDelegate(GraphConnection connection, GraphAgent agent);
 
 
         //  MEMBERS
