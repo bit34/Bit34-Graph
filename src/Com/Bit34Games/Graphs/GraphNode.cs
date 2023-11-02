@@ -8,6 +8,7 @@ namespace Com.Bit34Games.Graphs
     {
         //  MEMBERS
         public int Id                     { get; private set; }
+        public int RuntimeIndex           { get; private set; }
         public int StaticConnectionCount  { get { return _staticConnections.Length; } }
         public int DynamicConnectionCount { get { return _dynamicConnections.Count; } }
         //      Internal
@@ -66,10 +67,11 @@ namespace Com.Bit34Games.Graphs
             return null;
         }
         
-        internal void AddedToGraph(object ownerGraph, int id, int staticConnectionCount)
+        internal void AddedToGraph(object ownerGraph, int id, int runtimeIndex, int staticConnectionCount)
         {
             this.ownerGraph    = ownerGraph;
             Id                 = id;
+            RuntimeIndex       = runtimeIndex;
             _staticConnections = new GraphConnection[staticConnectionCount];
         }
 

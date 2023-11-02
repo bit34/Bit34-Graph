@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    public class Graph<TConfig, TNode, TConnection>
+    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode>
         where TConfig : GraphConfig<TNode>
         where TNode : GraphNode
         where TConnection : GraphConnection
@@ -17,7 +17,9 @@ namespace Com.Bit34Games.Graphs
         //      Private
         private readonly IGraphAllocator<TNode, TConnection> _allocator;
         private readonly Dictionary<int, TNode>              _nodes;
-        private int                                          _operationId;
+        private int                                          _runtimeIndexCounter;
+        private LinkedList<int>                              _freeRuntimeIndices;
+        private LinkedList<Agent<TNode, TConnection>>   _agent;
 
 
         //  CONSTRUCTORS
@@ -27,8 +29,12 @@ namespace Com.Bit34Games.Graphs
             Config         = config;
             _allocator     = allocator;
             _nodes         = new Dictionary<int, TNode>();
-            _operationId   = 0;
             NodeIdCounter  = -1;
+
+            _runtimeIndexCounter = 0;
+            _freeRuntimeIndices  = new LinkedList<int>();
+
+            _agent = new LinkedList<Agent<TNode, TConnection>>();
         }
 
 
@@ -55,8 +61,19 @@ namespace Com.Bit34Games.Graphs
                 throw new Exception("Graph Exception:Cannot create node on a fixed graph");
             }
 
+            int runtimeIndex;
+            if (_freeRuntimeIndices.Count>0)
+            {
+                runtimeIndex = _freeRuntimeIndices.Last.Value;
+                _freeRuntimeIndices.RemoveLast();
+            }
+            else
+            {
+                runtimeIndex = _runtimeIndexCounter++;
+            }
+
             TNode node = _allocator.CreateNode();
-            node.AddedToGraph(this, nodeId, Config.staticConnectionCount);
+            node.AddedToGraph(this, nodeId, runtimeIndex, Config.staticConnectionCount);
             _nodes.Add(node.Id, node);
             NodeIdCounter = Math.Max(NodeIdCounter, node.Id);
 
@@ -103,6 +120,7 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Remove from graph
+            _freeRuntimeIndices.AddLast(node.RuntimeIndex);
             _nodes.Remove(node.Id);
             node.RemovedFromGraph();
 
@@ -212,158 +230,16 @@ namespace Com.Bit34Games.Graphs
             }
         }
 
-        public bool FindPath(int startNodeId, int targetNodeId, GraphPathConfig pathConfig, GraphPath path, GraphAgent agent = null)
+        public void AddAgent(Agent<TNode, TConnection> agent)
         {
-            return FindPath(_nodes[startNodeId], _nodes[targetNodeId], pathConfig, path, agent);
+            _agent.AddLast(agent);
+            agent.AddedToGraph(this);
         }
 
-        public bool FindPath(TNode startNode, TNode endNode, GraphPathConfig pathConfig, GraphPath path, GraphAgent agent = null)
+        public void RemoveAgent(Agent<TNode, TConnection> agent)
         {
-            //  New operation id
-            int openListOperationId   = ++_operationId;
-            int closedListOperationId = ++_operationId;
-
-            //  OpenList
-            LinkedList<TNode> openNodeList = new LinkedList<TNode>();
-
-            //  Add start node to open list
-            startNode.operationId = openListOperationId;
-            startNode.operationParam = 0;
-            startNode.selectedConnection = null;
-            openNodeList.AddLast(startNode);
-
-            //  Iterate open nodes until end node is reached or no open nodes left in queue
-            while (openNodeList.Count > 0)
-            {
-                //  Remove node and mark as closed
-                TNode openNode = (TNode)PickNodeWithLowestOperationParam(openNodeList);
-                openNode.operationId = closedListOperationId;
-
-                ////  Stop when end reached
-                //if (openNode==endNode)
-                //{
-                //    break;
-                //}
-
-                //  Iterate static connections of node
-                if (pathConfig.useStaticConnections)
-                {
-                    for (int i = openNode.StaticConnectionCount - 1; i >= 0; i--)
-                    {
-                        //  Has static connection
-                        TConnection connection = (TConnection)openNode.GetStaticConnection(i);
-                        if (connection != null)
-                        {
-                            //  Check connection access restriction
-                            if (pathConfig.isConnectionAccessible != null && pathConfig.isConnectionAccessible(connection, agent) == false)
-                            {
-                                continue;
-                            }
-
-                            //  begin connection process
-                            TNode targetNode   = _nodes[connection.TargetNodeId];
-                            float weightToNode = openNode.operationParam + connection.Weight;
-
-                            //  If node is not visited
-                            if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
-                            {
-                                targetNode.operationId        = openListOperationId;
-                                targetNode.operationParam     = weightToNode;
-                                targetNode.selectedConnection = connection;
-                                openNodeList.AddLast(targetNode);
-                            }
-                            else if (targetNode.operationId == openListOperationId)
-                            {
-                                if (targetNode.operationParam > weightToNode)
-                                {
-                                    targetNode.operationParam = weightToNode;
-                                    targetNode.selectedConnection = connection;
-                                }
-                            }
-                            //  end connection process
-                        }
-                    }
-                }
-
-                //  Iterate dynamic connections on node
-                if (pathConfig.useDynamicConnections)
-                {
-                    IEnumerator<GraphConnection> connections = openNode.GetDynamicConnectionEnumerator();
-                    while (connections.MoveNext())
-                    {
-                        GraphConnection connection = connections.Current;
-
-                        //  Check connection access restriction
-                        if (pathConfig.isConnectionAccessible != null && pathConfig.isConnectionAccessible(connection, agent) == false)
-                        {
-                            continue;
-                        }
-
-                        //  begin connection process
-                        TNode targetNode   = _nodes[connection.TargetNodeId];
-                        float weightToNode = openNode.operationParam + connection.Weight;
-
-                        //  If node is not visited
-                        if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
-                        {
-                            targetNode.operationId        = openListOperationId;
-                            targetNode.operationParam     = weightToNode;
-                            targetNode.selectedConnection = connection;
-                            openNodeList.AddLast(targetNode);
-                        }
-                        else if (targetNode.operationId == openListOperationId)
-                        {
-                            if (targetNode.operationParam > weightToNode)
-                            {
-                                targetNode.operationParam = weightToNode;
-                                targetNode.selectedConnection = connection;
-                            }
-                        }
-                        //  end connection process
-                    }
-                }
-            }
-
-            //  Is end node reached
-            if (endNode.operationId == closedListOperationId)
-            {
-                //  Init path
-                path.Init(startNode.Id, endNode.Id);
-
-                //  Backtrack connections from end to start
-                TConnection connection = (TConnection)endNode.selectedConnection;
-
-                do
-                {
-                    path.Connections.AddFirst(connection);
-                    connection = (TConnection)_nodes[connection.SourceNodeId].selectedConnection;
-                }
-                while (connection != null);
-
-                return true;
-            }
-
-            //  No valid path
-            return false;
-        }
-
-        private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)
-        {
-            LinkedListNode<TNode> lowest = nodeList.First;
-
-            LinkedListNode<TNode> current = lowest.Next;
-            while (current != null)
-            {
-                if (current.Value.operationParam < lowest.Value.operationParam)
-                {
-                    lowest = current;
-                }
-                current = current.Next;
-            }
-
-            TNode node = lowest.Value;
-            nodeList.Remove(lowest);
-            return node;
+            _agent.Remove(agent);
+            agent.RemovedFromGraph();
         }
 
     }

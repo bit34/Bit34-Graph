@@ -3,7 +3,7 @@
 
 namespace Com.Bit34Games.Graphs
 {
-    public class GraphPath
+    public class AgentPath
     {
         //  MEMBERS
         public int StartNodeId { get; private set; }
@@ -12,7 +12,7 @@ namespace Com.Bit34Games.Graphs
 
 
         //  CONSTRUCTOR(S)
-        public GraphPath()
+        public AgentPath()
         {
             Connections = new LinkedList<GraphConnection>();
         }
