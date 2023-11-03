@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Com.Bit34Games.Graphs
 {
@@ -27,12 +28,12 @@ namespace Com.Bit34Games.Graphs
             ownerGraph = null;
         }
 
-       public bool FindPath(int startNodeId, int targetNodeId, AgentPathConfig<TNode, TConnection> pathConfig, AgentPath path, Agent<TNode, TConnection> agent = null)
+       public AgentPath FindPath(int startNodeId, int targetNodeId, AgentPathConfig<TNode, TConnection> pathConfig, Agent<TNode, TConnection> agent = null)
        {
-           return FindPath(ownerGraph.GetNode(startNodeId), ownerGraph.GetNode(targetNodeId), pathConfig, path, agent);
+           return FindPath(ownerGraph.GetNode(startNodeId), ownerGraph.GetNode(targetNodeId), pathConfig, agent);
        }
 
-        public bool FindPath(TNode startNode, TNode endNode, AgentPathConfig<TNode, TConnection> pathConfig, AgentPath path, Agent<TNode, TConnection> agent = null)
+        public AgentPath FindPath(TNode startNode, TNode endNode, AgentPathConfig<TNode, TConnection> pathConfig, Agent<TNode, TConnection> agent = null)
         {
             //  New operation id
             int openListOperationId   = ++_operationId;
@@ -142,24 +143,22 @@ namespace Com.Bit34Games.Graphs
             //  Is end node reached
             if (endNode.operationId == closedListOperationId)
             {
-                //  Init path
-                path.Init(startNode.Id, endNode.Id);
-
+                LinkedList<GraphConnection> connections = new LinkedList<GraphConnection>();
                 //  Backtrack connections from end to start
                 TConnection connection = (TConnection)endNode.selectedConnection;
 
                 do
                 {
-                    path.Connections.AddFirst(connection);
+                    connections.AddFirst(connection);
                     connection = (TConnection)ownerGraph.GetNode(connection.SourceNodeId).selectedConnection;
                 }
                 while (connection != null);
 
-                return true;
+                return new AgentPath(startNode.Id, endNode.Id, connections.ToArray());
             }
 
             //  No valid path
-            return false;
+            return null;
         }
 
         private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)

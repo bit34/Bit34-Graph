@@ -1,29 +1,30 @@
-﻿using System.Collections.Generic;
-
-
-namespace Com.Bit34Games.Graphs
+﻿namespace Com.Bit34Games.Graphs
 {
     public class AgentPath
     {
         //  MEMBERS
-        public int StartNodeId { get; private set; }
-        public int EndNodeId { get; private set; }
-        public LinkedList<GraphConnection> Connections { get; private set; }
+        public readonly int startNodeId;
+        public readonly int endNodeId;
+        public int          ConnectionCount { get { return _connections.Length; } }
+        //      private
+        private GraphConnection[] _connections;
 
 
         //  CONSTRUCTOR(S)
-        public AgentPath()
+        public AgentPath(int               startNodeId, 
+                         int               endNodeId,
+                         GraphConnection[] connections)
         {
-            Connections = new LinkedList<GraphConnection>();
+            this.startNodeId = startNodeId;
+            this.endNodeId   = endNodeId;
+            _connections     = connections;
         }
 
 
         //  METHODS
-        internal void Init(int startNodeId, int endNodeId)
+        public GraphConnection Getconnection(int index)
         {
-            StartNodeId = startNodeId;
-            EndNodeId   = endNodeId;
-            Connections.Clear();
+            return _connections[index];
         }
 
     }
