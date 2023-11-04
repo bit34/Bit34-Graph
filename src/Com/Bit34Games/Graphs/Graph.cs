@@ -4,22 +4,23 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode>
+    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode>,
+                                                      IGraphNodeOwner
         where TConfig : GraphConfig<TNode>
         where TNode : GraphNode
         where TConnection : GraphConnection
     {
         //	MEMBERS
-        public int  NodeCount     { get { return _nodes.Count; } }
-        public int  NodeIdCounter { get; private set; }
-        public bool IsFixed       { get; protected set; }
+        public bool             IsFixed { get; protected set; }
         public readonly TConfig Config;
+        public int              NodeCount { get { return _nodes.Count; } }
+        public int              NodeIdCounter { get; private set; }
+        public int              NodeRuntimeIndexCounter { get; private set;}
         //      Private
         private readonly IGraphAllocator<TNode, TConnection> _allocator;
         private readonly Dictionary<int, TNode>              _nodes;
-        private int                                          _runtimeIndexCounter;
-        private LinkedList<int>                              _freeRuntimeIndices;
-        private LinkedList<Agent<TNode, TConnection>>   _agent;
+        private LinkedList<int>                              _freeNodeRuntimeIndices;
+        private LinkedList<Agent<TNode, TConnection>>        _agents;
 
 
         //  CONSTRUCTORS
@@ -31,10 +32,10 @@ namespace Com.Bit34Games.Graphs
             _nodes         = new Dictionary<int, TNode>();
             NodeIdCounter  = -1;
 
-            _runtimeIndexCounter = 0;
-            _freeRuntimeIndices  = new LinkedList<int>();
+            NodeRuntimeIndexCounter = 0;
+            _freeNodeRuntimeIndices  = new LinkedList<int>();
 
-            _agent = new LinkedList<Agent<TNode, TConnection>>();
+            _agents = new LinkedList<Agent<TNode, TConnection>>();
         }
 
 
@@ -62,14 +63,15 @@ namespace Com.Bit34Games.Graphs
             }
 
             int runtimeIndex;
-            if (_freeRuntimeIndices.Count>0)
+
+            if (_freeNodeRuntimeIndices.Count>0)
             {
-                runtimeIndex = _freeRuntimeIndices.Last.Value;
-                _freeRuntimeIndices.RemoveLast();
+                runtimeIndex = _freeNodeRuntimeIndices.Last.Value;
+                _freeNodeRuntimeIndices.RemoveLast();
             }
             else
             {
-                runtimeIndex = _runtimeIndexCounter++;
+                runtimeIndex = NodeRuntimeIndexCounter++;
             }
 
             TNode node = _allocator.CreateNode();
@@ -120,7 +122,7 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Remove from graph
-            _freeRuntimeIndices.AddLast(node.RuntimeIndex);
+            _freeNodeRuntimeIndices.AddLast(node.RuntimeIndex);
             _nodes.Remove(node.Id);
             node.RemovedFromGraph();
 
@@ -162,7 +164,10 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Set connections
-            connection.Set(source.Id, sourceConnectionIndex, target.Id, targetConnectionIndex, Config.CalculateConnectionWeight(source, target), oppositeConnection);
+            connection.Set(source.Id, source.RuntimeIndex, sourceConnectionIndex, 
+                           target.Id, target.RuntimeIndex, targetConnectionIndex, 
+                           Config.CalculateConnectionWeight(source, target), 
+                           oppositeConnection);
 
             if (sourceConnectionIndex == -1)
             {
@@ -180,7 +185,10 @@ namespace Com.Bit34Games.Graphs
             //  Set opposite connections
             if (createOpposite)
             {
-                oppositeConnection.Set(target.Id, targetConnectionIndex, source.Id, sourceConnectionIndex, Config.CalculateConnectionWeight(target, source), connection);
+                oppositeConnection.Set(target.Id, target.RuntimeIndex, targetConnectionIndex, 
+                                       source.Id, source.RuntimeIndex, sourceConnectionIndex, 
+                                       Config.CalculateConnectionWeight(target, source), 
+                                       connection);
 
                 if (targetConnectionIndex == -1)
                 {
@@ -232,13 +240,13 @@ namespace Com.Bit34Games.Graphs
 
         public void AddAgent(Agent<TNode, TConnection> agent)
         {
-            _agent.AddLast(agent);
+            _agents.AddLast(agent);
             agent.AddedToGraph(this);
         }
 
         public void RemoveAgent(Agent<TNode, TConnection> agent)
         {
-            _agent.Remove(agent);
+            _agents.Remove(agent);
             agent.RemovedFromGraph();
         }
 

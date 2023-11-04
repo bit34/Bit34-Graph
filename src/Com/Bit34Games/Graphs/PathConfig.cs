@@ -2,7 +2,7 @@
 
 namespace Com.Bit34Games.Graphs
 {
-    public class AgentPathConfig<TNode, TConnection>
+    public class PathConfig<TNode, TConnection>
         where TNode : GraphNode
         where TConnection : GraphConnection
     {
@@ -17,9 +17,9 @@ namespace Com.Bit34Games.Graphs
 
 
         //  CONSTRUCTOR(S)
-        public AgentPathConfig(bool useStaticConnections=true, 
-                               bool useDynamicConnections=true, 
-                               Func<GraphConnection,IAgentPathOwner,bool> isConnectionAccessible=null)
+        public PathConfig(bool useStaticConnections=true, 
+                          bool useDynamicConnections=true, 
+                          Func<GraphConnection,IAgentPathOwner,bool> isConnectionAccessible=null)
         {
             this.useStaticConnections   = useStaticConnections;
             this.useDynamicConnections  = useDynamicConnections;

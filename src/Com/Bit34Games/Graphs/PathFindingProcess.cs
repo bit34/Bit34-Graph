@@ -7,64 +7,54 @@ namespace Com.Bit34Games.Graphs
         where TConnection : GraphConnection
     {
         //  MEMBERS
-        public readonly TNode                               startNode;
-        public readonly TNode                               endNode;
-        public readonly AgentPathConfig<TNode, TConnection> pathConfig;
-        public readonly Agent<TNode, TConnection>           agent;
-        public readonly int                                 openListOperationId;
-        public readonly int                                 closedListOperationId;
-        public readonly LinkedList<TNode>                   openNodeList;
+        public readonly TNode                          startNode;
+        public readonly TNode                          endNode;
+        public readonly PathConfig<TNode, TConnection> pathConfig;
+        public readonly Agent<TNode, TConnection>      agent;
+        //      Private
+        private readonly PathNode[]           _pathNodes;
+        private readonly LinkedList<PathNode> _openPathNodeList;
 
         //  CONSTRUCTORS
-        public PathFindingProcess(TNode                               startNode,
-                                  TNode                               endNode,
-                                  AgentPathConfig<TNode, TConnection> pathConfig,
-                                  Agent<TNode, TConnection>           agent,
-                                  int                                 openListOperationId,
-                                  int                                 closedListOperationId)
+        public PathFindingProcess(TNode                          startNode,
+                                  TNode                          endNode,
+                                  PathConfig<TNode, TConnection> pathConfig,
+                                  Agent<TNode, TConnection>      agent)
         {
-            this.startNode             = startNode;
-            this.endNode               = endNode;
-            this.pathConfig            = pathConfig;
-            this.agent                 = agent;
-            this.openListOperationId   = openListOperationId;
-            this.closedListOperationId = closedListOperationId;
-            openNodeList               = new LinkedList<TNode>();
+            this.startNode    = startNode;
+            this.endNode      = endNode;
+            this.pathConfig   = pathConfig;
+            this.agent        = agent;
+            _pathNodes        = new PathNode[agent.ownerGraph.NodeRuntimeIndexCounter];
+            _openPathNodeList = new LinkedList<PathNode>();
 
-            AddStartNode();
+            Initialize();
         }
 
         //  METHODS
-        private void AddStartNode()
+        private void Initialize()
         {
-            //  Add start node to open list
-            startNode.operationId        = openListOperationId;
-            startNode.operationParam     = 0;
-            startNode.selectedConnection = null;
-            openNodeList.AddLast(startNode);
+            _pathNodes[startNode.RuntimeIndex] = new PathNode(startNode.Id, startNode.RuntimeIndex);
+            _openPathNodeList.AddLast(_pathNodes[startNode.RuntimeIndex]);
         }
 
         public bool HasSteps()
         {
-            return openNodeList.Count > 0;
+            return _openPathNodeList.Count > 0;
         }
 
         public bool EndReached()
         {
-            return endNode.operationId == closedListOperationId;
+            return _pathNodes[endNode.RuntimeIndex] != null && 
+                   _pathNodes[endNode.RuntimeIndex].isClosed;
         }
 
         public void PerformStep()
         {
             //  Remove node and mark as closed
-            TNode openNode = (TNode)PickNodeWithLowestOperationParam();
-            openNode.operationId = closedListOperationId;
-
-            ////  Stop when end reached
-            //if (openNode==endNode)
-            //{
-            //    break;
-            //}
+            PathNode openPathNode = PickOpenNodeWithLowestWeight();
+            TNode    openNode     = agent.ownerGraph.GetNode(openPathNode.id);
+            openPathNode.isClosed = true;
 
             //  Iterate static connections of node
             if (pathConfig.useStaticConnections)
@@ -75,7 +65,7 @@ namespace Com.Bit34Games.Graphs
                     TConnection connection = (TConnection)openNode.GetStaticConnection(i);
                     if (connection != null)
                     {
-                        ProcessConnection(openNode, connection);
+                        ProcessConnection(openPathNode, connection);
                     }
                 }
             }
@@ -87,7 +77,7 @@ namespace Com.Bit34Games.Graphs
                 while (connections.MoveNext())
                 {
                     GraphConnection connection = connections.Current;
-                    ProcessConnection(openNode, connection);
+                    ProcessConnection(openPathNode, connection);
                 }
             }
         }
@@ -95,13 +85,14 @@ namespace Com.Bit34Games.Graphs
         public TConnection[] BacktrackConnections()
         {
             LinkedList<TConnection> connections = new LinkedList<TConnection>();
+
             //  Backtrack connections from end to start
-            TConnection connection = (TConnection)endNode.selectedConnection;
+            TConnection connection = (TConnection)_pathNodes[endNode.RuntimeIndex].selectedConnection;
 
             do
             {
                 connections.AddFirst(connection);
-                connection = (TConnection)agent.ownerGraph.GetNode(connection.SourceNodeId).selectedConnection;
+                connection = (TConnection)_pathNodes[connection.SourceNodeRuntimeIndex].selectedConnection;
             }
             while (connection != null);
 
@@ -117,26 +108,26 @@ namespace Com.Bit34Games.Graphs
             return connectionsArray;
         }
 
-        private TNode PickNodeWithLowestOperationParam()
+        private PathNode PickOpenNodeWithLowestWeight()
         {
-            LinkedListNode<TNode> lowest = openNodeList.First;
+            LinkedListNode<PathNode> lowest = _openPathNodeList.First;
 
-            LinkedListNode<TNode> current = lowest.Next;
+            LinkedListNode<PathNode> current = lowest.Next;
             while (current != null)
             {
-                if (current.Value.operationParam < lowest.Value.operationParam)
+                if (current.Value.weight < lowest.Value.weight)
                 {
                     lowest = current;
                 }
                 current = current.Next;
             }
 
-            TNode node = lowest.Value;
-            openNodeList.Remove(lowest);
+            PathNode node = lowest.Value;
+            _openPathNodeList.Remove(lowest);
             return node;
         }
 
-        private void ProcessConnection(TNode openNode, GraphConnection connection)
+        private void ProcessConnection(PathNode openNode, GraphConnection connection)
         {
             if (pathConfig.isConnectionAccessible != null && 
                 pathConfig.isConnectionAccessible(connection, agent) == false)
@@ -144,27 +135,28 @@ namespace Com.Bit34Games.Graphs
                 return;
             }
 
-            //  begin connection process
-            TNode targetNode   = agent.ownerGraph.GetNode(connection.TargetNodeId);
-            float weightToNode = openNode.operationParam + connection.Weight;
+            PathNode targetPathNode     = _pathNodes[connection.TargetNodeRuntimeIndex];
+            float    weightToTargetNode = openNode.weight + connection.Weight;
 
             //  If node is not visited
-            if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
+            if (targetPathNode == null)
             {
-                targetNode.operationId        = openListOperationId;
-                targetNode.operationParam     = weightToNode;
-                targetNode.selectedConnection = connection;
-                openNodeList.AddLast(targetNode);
+                TNode targetNode                   = agent.ownerGraph.GetNode(connection.TargetNodeId);
+                targetPathNode                     = new PathNode(targetNode.Id, targetNode.RuntimeIndex);
+                targetPathNode.weight              = weightToTargetNode;
+                targetPathNode.selectedConnection  = connection;
+                _pathNodes[targetPathNode.runtimeIndex] = targetPathNode;
+                _openPathNodeList.AddLast(targetPathNode);
             }
-            else if (targetNode.operationId == openListOperationId)
+            else 
+            if (targetPathNode.isClosed == false)
             {
-                if (targetNode.operationParam > weightToNode)
+                if (targetPathNode.weight > weightToTargetNode)
                 {
-                    targetNode.operationParam = weightToNode;
-                    targetNode.selectedConnection = connection;
+                    targetPathNode.weight             = weightToTargetNode;
+                    targetPathNode.selectedConnection = connection;
                 }
             }
-            //  end connection process
         }
     }
 }

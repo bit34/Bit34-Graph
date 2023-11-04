@@ -12,21 +12,16 @@ namespace Com.Bit34Games.Graphs
         public int StaticConnectionCount  { get { return _staticConnections.Length; } }
         public int DynamicConnectionCount { get { return _dynamicConnections.Count; } }
         //      Internal
+        internal IGraphNodeOwner ownerGraph;
+        //      private
         private GraphConnection[]           _staticConnections;
         private LinkedList<GraphConnection> _dynamicConnections;
-        //      Fields for internal operations
-        internal object          ownerGraph;
-        internal int             operationId;
-        internal float           operationParam;
-        internal GraphConnection selectedConnection;
 
 
         //  CONSTRUCTORS
         public GraphNode()
         {
             _dynamicConnections = new LinkedList<GraphConnection>();
-            operationId         = 0;
-            operationParam      = 0;
         }
 
 
@@ -67,9 +62,9 @@ namespace Com.Bit34Games.Graphs
             return null;
         }
         
-        internal void AddedToGraph(object ownerGraph, int id, int runtimeIndex, int staticConnectionCount)
+        internal void AddedToGraph(IGraphNodeOwner owner, int id, int runtimeIndex, int staticConnectionCount)
         {
-            this.ownerGraph    = ownerGraph;
+            this.ownerGraph    = owner;
             Id                 = id;
             RuntimeIndex       = runtimeIndex;
             _staticConnections = new GraphConnection[staticConnectionCount];

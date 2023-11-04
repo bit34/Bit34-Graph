@@ -1,6 +1,6 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class AgentPath
+    public class Path
     {
         //  MEMBERS
         public readonly int startNodeId;
@@ -11,9 +11,9 @@
 
 
         //  CONSTRUCTOR(S)
-        public AgentPath(int               startNodeId, 
-                         int               endNodeId,
-                         GraphConnection[] connections)
+        public Path(int               startNodeId, 
+                    int               endNodeId,
+                    GraphConnection[] connections)
         {
             this.startNodeId = startNodeId;
             this.endNodeId   = endNodeId;
