@@ -28,156 +28,40 @@ namespace Com.Bit34Games.Graphs
             ownerGraph = null;
         }
 
-       public AgentPath FindPath(int startNodeId, int targetNodeId, AgentPathConfig<TNode, TConnection> pathConfig, Agent<TNode, TConnection> agent = null)
-       {
-           return FindPath(ownerGraph.GetNode(startNodeId), ownerGraph.GetNode(targetNodeId), pathConfig, agent);
-       }
-
-        public AgentPath FindPath(TNode startNode, TNode endNode, AgentPathConfig<TNode, TConnection> pathConfig, Agent<TNode, TConnection> agent = null)
+        public AgentPath FindPath(int                                 startNodeId, 
+                                  int                                 targetNodeId, 
+                                  AgentPathConfig<TNode, TConnection> pathConfig)
         {
-            //  New operation id
-            int openListOperationId   = ++_operationId;
-            int closedListOperationId = ++_operationId;
+            return FindPath(ownerGraph.GetNode(startNodeId), ownerGraph.GetNode(targetNodeId), pathConfig);
+        }
 
-            //  OpenList
-            LinkedList<TNode> openNodeList = new LinkedList<TNode>();
-
-            //  Add start node to open list
-            startNode.operationId = openListOperationId;
-            startNode.operationParam = 0;
-            startNode.selectedConnection = null;
-            openNodeList.AddLast(startNode);
+        public AgentPath FindPath(TNode                               startNode, 
+                                  TNode                               endNode, 
+                                  AgentPathConfig<TNode, TConnection> pathConfig)
+        {
+            PathFindingProcess<TNode, TConnection> process = new PathFindingProcess<TNode, TConnection>(startNode, 
+                                                                                                        endNode, 
+                                                                                                        pathConfig, 
+                                                                                                        this, 
+                                                                                                        ++_operationId, 
+                                                                                                        ++_operationId);
 
             //  Iterate open nodes until end node is reached or no open nodes left in queue
-            while (openNodeList.Count > 0)
+            while (process.HasSteps())
             {
-                //  Remove node and mark as closed
-                TNode openNode = (TNode)PickNodeWithLowestOperationParam(openNodeList);
-                openNode.operationId = closedListOperationId;
-
-                ////  Stop when end reached
-                //if (openNode==endNode)
-                //{
-                //    break;
-                //}
-
-                //  Iterate static connections of node
-                if (pathConfig.useStaticConnections)
-                {
-                    for (int i = openNode.StaticConnectionCount - 1; i >= 0; i--)
-                    {
-                        //  Has static connection
-                        TConnection connection = (TConnection)openNode.GetStaticConnection(i);
-                        if (connection != null)
-                        {
-                            //  Check connection access restriction
-                            if (pathConfig.isConnectionAccessible != null && pathConfig.isConnectionAccessible(connection, agent) == false)
-                            {
-                                continue;
-                            }
-
-                            //  begin connection process
-                            TNode targetNode   = ownerGraph.GetNode(connection.TargetNodeId);
-                            float weightToNode = openNode.operationParam + connection.Weight;
-
-                            //  If node is not visited
-                            if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
-                            {
-                                targetNode.operationId        = openListOperationId;
-                                targetNode.operationParam     = weightToNode;
-                                targetNode.selectedConnection = connection;
-                                openNodeList.AddLast(targetNode);
-                            }
-                            else if (targetNode.operationId == openListOperationId)
-                            {
-                                if (targetNode.operationParam > weightToNode)
-                                {
-                                    targetNode.operationParam = weightToNode;
-                                    targetNode.selectedConnection = connection;
-                                }
-                            }
-                            //  end connection process
-                        }
-                    }
-                }
-
-                //  Iterate dynamic connections on node
-                if (pathConfig.useDynamicConnections)
-                {
-                    IEnumerator<GraphConnection> connections = openNode.GetDynamicConnectionEnumerator();
-                    while (connections.MoveNext())
-                    {
-                        GraphConnection connection = connections.Current;
-
-                        //  Check connection access restriction
-                        if (pathConfig.isConnectionAccessible != null && pathConfig.isConnectionAccessible(connection, agent) == false)
-                        {
-                            continue;
-                        }
-
-                        //  begin connection process
-                        TNode targetNode   = ownerGraph.GetNode(connection.TargetNodeId);
-                        float weightToNode = openNode.operationParam + connection.Weight;
-
-                        //  If node is not visited
-                        if (targetNode.operationId != openListOperationId && targetNode.operationId != closedListOperationId)
-                        {
-                            targetNode.operationId        = openListOperationId;
-                            targetNode.operationParam     = weightToNode;
-                            targetNode.selectedConnection = connection;
-                            openNodeList.AddLast(targetNode);
-                        }
-                        else if (targetNode.operationId == openListOperationId)
-                        {
-                            if (targetNode.operationParam > weightToNode)
-                            {
-                                targetNode.operationParam = weightToNode;
-                                targetNode.selectedConnection = connection;
-                            }
-                        }
-                        //  end connection process
-                    }
-                }
+                process.PerformStep();
             }
 
             //  Is end node reached
-            if (endNode.operationId == closedListOperationId)
+            if (process.EndReached())
             {
-                LinkedList<GraphConnection> connections = new LinkedList<GraphConnection>();
-                //  Backtrack connections from end to start
-                TConnection connection = (TConnection)endNode.selectedConnection;
-
-                do
-                {
-                    connections.AddFirst(connection);
-                    connection = (TConnection)ownerGraph.GetNode(connection.SourceNodeId).selectedConnection;
-                }
-                while (connection != null);
-
-                return new AgentPath(startNode.Id, endNode.Id, connections.ToArray());
+                return new AgentPath(process.startNode.Id, process.endNode.Id, process.BacktrackConnections());
             }
 
             //  No valid path
             return null;
         }
 
-        private TNode PickNodeWithLowestOperationParam(LinkedList<TNode> nodeList)
-        {
-            LinkedListNode<TNode> lowest = nodeList.First;
-
-            LinkedListNode<TNode> current = lowest.Next;
-            while (current != null)
-            {
-                if (current.Value.operationParam < lowest.Value.operationParam)
-                {
-                    lowest = current;
-                }
-                current = current.Next;
-            }
-
-            TNode node = lowest.Value;
-            nodeList.Remove(lowest);
-            return node;
-        }
     }
+
 }
