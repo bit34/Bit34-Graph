@@ -1,7 +1,7 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
     public class GraphAllocator<TNode, TConnection> : IGraphAllocator<TNode, TConnection>
-        where TNode : GraphNode, new()
+        where TNode : GraphNode<TConnection>, new()
         where TConnection : GraphConnection, new()
     {
         //  CONSTRUCTORS

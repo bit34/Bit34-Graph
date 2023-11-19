@@ -1,7 +1,7 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
     public interface IGraphAllocator<TNode, TConnection>
-        where TNode : GraphNode
+        where TNode : GraphNode<TConnection>
         where TConnection : GraphConnection
     {
         TNode CreateNode();

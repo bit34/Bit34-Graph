@@ -3,7 +3,7 @@
 namespace Com.Bit34Games.Graphs
 {
     public class PathConfig<TNode, TConnection>
-        where TNode : GraphNode
+        where TNode : GraphNode<TConnection>
         where TConnection : GraphConnection
     {
         //  DELEGATES

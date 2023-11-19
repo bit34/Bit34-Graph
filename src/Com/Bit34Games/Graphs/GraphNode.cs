@@ -4,53 +4,54 @@
 namespace Com.Bit34Games.Graphs
 {
 
-    public class GraphNode
+    public class GraphNode<TConnection>
+        where TConnection : GraphConnection
     {
         //  MEMBERS
         public int Id                     { get; private set; }
         public int RuntimeIndex           { get; private set; }
-        public int StaticConnectionCount  { get { return _staticConnections.Length; } }
-        public int DynamicConnectionCount { get { return _dynamicConnections.Count; } }
+        public int StaticConnectionCount  { get { return staticConnections.Length; } }
+        public int DynamicConnectionCount { get { return dynamicConnections.Count; } }
         //      Internal
-        internal IGraphNodeOwner ownerGraph;
-        //      private
-        private GraphConnection[]           _staticConnections;
-        private LinkedList<GraphConnection> _dynamicConnections;
+        internal IGraphNodeOwner         ownerGraph;
+        internal TConnection[]           staticConnections;
+        internal LinkedList<TConnection> dynamicConnections;
 
 
         //  CONSTRUCTORS
         public GraphNode()
         {
-            _dynamicConnections = new LinkedList<GraphConnection>();
+            dynamicConnections = new LinkedList<TConnection>();
         }
 
 
         //  METHODS
-        public GraphConnection GetStaticConnection(int connectionIndex)
+
+        public TConnection GetStaticConnection(int connectionIndex)
         {
-            return _staticConnections[connectionIndex];
+            return staticConnections[connectionIndex];
         }
 
-        public GraphConnection GetStaticConnectionTo(int nodeId)
+        public TConnection GetStaticConnectionTo(int nodeId)
         {
-            for (int i = 0; i < _staticConnections.Length; i++)
+            for (int i = 0; i < staticConnections.Length; i++)
             {
-                if (_staticConnections[i] != null && _staticConnections[i].TargetNodeId == nodeId)
+                if (staticConnections[i] != null && staticConnections[i].TargetNodeId == nodeId)
                 {
-                    return _staticConnections[i];
+                    return staticConnections[i];
                 }
             }
             return null;
         }
 
-        public IEnumerator<GraphConnection> GetDynamicConnectionEnumerator()
+        public IEnumerator<TConnection> GetDynamicConnectionEnumerator()
         {
-            return _dynamicConnections.GetEnumerator();
+            return dynamicConnections.GetEnumerator();
         }
 
         public GraphConnection GetDynamicConnectionTo(int nodeId)
         {
-            IEnumerator<GraphConnection> connections = _dynamicConnections.GetEnumerator();
+            IEnumerator<TConnection> connections = dynamicConnections.GetEnumerator();
 
             while (connections.MoveNext() == true)
             {
@@ -67,34 +68,34 @@ namespace Com.Bit34Games.Graphs
             this.ownerGraph    = owner;
             Id                 = id;
             RuntimeIndex       = runtimeIndex;
-            _staticConnections = new GraphConnection[staticConnectionCount];
+            staticConnections = new TConnection[staticConnectionCount];
         }
 
         internal void RemovedFromGraph()
         {
             ownerGraph         = null;
             Id                 = -1;
-            _staticConnections = null;
+            staticConnections = null;
         }
 
-        internal void SetStaticConnection(int connectionIndex, GraphConnection connection)
+        internal void SetStaticConnection(int connectionIndex, TConnection connection)
         {
-            _staticConnections[connectionIndex] = connection;
+            staticConnections[connectionIndex] = connection;
         }
 
-        internal void AddDynamicConnection(GraphConnection connection)
+        internal void AddDynamicConnection(TConnection connection)
         {
-            _dynamicConnections.AddLast(connection);
+            dynamicConnections.AddLast(connection);
         }
 
-        internal void RemoveDynamicConnection(GraphConnection connection)
+        internal void RemoveDynamicConnection(TConnection connection)
         {
-            _dynamicConnections.Remove(connection);
+            dynamicConnections.Remove(connection);
         }
 
-        internal GraphConnection GetFirstDynamicConnection()
+        internal TConnection GetFirstDynamicConnection()
         {
-            return _dynamicConnections.First.Value;
+            return dynamicConnections.First.Value;
         }
 
     }

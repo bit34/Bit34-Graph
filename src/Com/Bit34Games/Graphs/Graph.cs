@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode>,
+    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode, TConnection>,
                                                       IGraphNodeOwner
-        where TConfig : GraphConfig<TNode>
-        where TNode : GraphNode
+        where TConfig : GraphConfig<TNode, TConnection>
+        where TNode : GraphNode<TConnection>
         where TConnection : GraphConnection
     {
         //	MEMBERS
@@ -40,6 +40,8 @@ namespace Com.Bit34Games.Graphs
 
 
         //	METHODS
+#region Node Methods
+    
         public TNode GetNode(int id)
         {
             return _nodes[id];
@@ -107,7 +109,7 @@ namespace Com.Bit34Games.Graphs
             //  Remove referencing static connections
             for (int i = 0; i < node.StaticConnectionCount; i++)
             {
-                TConnection connection = (TConnection)node.GetStaticConnection(i);
+                TConnection connection = (TConnection)node.staticConnections[i];
                 if (connection != null)
                 {
                     RemoveConnection(connection);
@@ -128,6 +130,10 @@ namespace Com.Bit34Games.Graphs
 
             _allocator.FreeNode(node);
         }
+
+#endregion
+
+#region Connection Methods
 
         protected TConnection AddConnection(int  sourceNodeId,
                                             int  targetNodeId,
@@ -175,9 +181,9 @@ namespace Com.Bit34Games.Graphs
             }
             else
             {
-                if (source.GetStaticConnection(sourceConnectionIndex) != null)
+                if (source.staticConnections[sourceConnectionIndex] != null)
                 {
-                    RemoveConnection((TConnection)source.GetStaticConnection(sourceConnectionIndex));
+                    RemoveConnection((TConnection)source.staticConnections[sourceConnectionIndex]);
                 }
                 source.SetStaticConnection(sourceConnectionIndex, connection);
             }
@@ -196,9 +202,9 @@ namespace Com.Bit34Games.Graphs
                 }
                 else
                 {
-                    if (target.GetStaticConnection(targetConnectionIndex) != null)
+                    if (target.staticConnections[targetConnectionIndex] != null)
                     {
-                        RemoveConnection((TConnection)target.GetStaticConnection(targetConnectionIndex));
+                        RemoveConnection((TConnection)target.staticConnections[targetConnectionIndex]);
                     }
                     target.SetStaticConnection(targetConnectionIndex, oppositeConnection);
                 }
@@ -237,6 +243,8 @@ namespace Com.Bit34Games.Graphs
                 }
             }
         }
+        
+#endregion
 
         public void AddAgent(Agent<TNode, TConnection> agent)
         {

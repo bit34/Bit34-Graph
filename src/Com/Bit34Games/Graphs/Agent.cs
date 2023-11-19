@@ -1,14 +1,14 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
     public class Agent<TNode, TConnection> : IAgentPathOwner
-        where TNode : GraphNode
+        where TNode : GraphNode<TConnection>
         where TConnection : GraphConnection
     {
         //  MEMBERS
-        internal IAgentOwner<TNode> ownerGraph;
+        internal IAgentOwner<TNode, TConnection> ownerGraph;
 
         //  METHODS
-        internal void AddedToGraph(IAgentOwner<TNode> ownerGraph)
+        internal void AddedToGraph(IAgentOwner<TNode, TConnection> ownerGraph)
         {
             this.ownerGraph = ownerGraph;
         }

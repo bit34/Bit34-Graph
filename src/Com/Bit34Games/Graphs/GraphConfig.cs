@@ -1,7 +1,8 @@
 namespace Com.Bit34Games.Graphs
 {
-    public abstract class GraphConfig<TNode>
-        where TNode : GraphNode
+    public abstract class GraphConfig<TNode, TConnection>
+        where TNode : GraphNode<TConnection>
+        where TConnection : GraphConnection
     {
         //  MEMBERS
         public readonly int staticConnectionCount;

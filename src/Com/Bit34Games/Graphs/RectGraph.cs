@@ -1,8 +1,8 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
     public class RectGraph<TConfig, TNode, TConnection> : GridGraph<TConfig, TNode, TConnection>
-        where TConfig : RectGraphConfig<TNode>
-        where TNode : RectGraphNode
+        where TConfig : RectGraphConfig<TNode, TConnection>
+        where TNode : RectGraphNode<TConnection>
         where TConnection : RectGraphConnection
     {
         //  MEMBERS

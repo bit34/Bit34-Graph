@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Com.Bit34Games.Graphs
 {
     internal class PathFindingProcess<TNode, TConnection>
-        where TNode : GraphNode
+        where TNode : GraphNode<TConnection>
         where TConnection : GraphConnection
     {
         //  MEMBERS
@@ -62,7 +62,7 @@ namespace Com.Bit34Games.Graphs
                 for (int i = openNode.StaticConnectionCount - 1; i >= 0; i--)
                 {
                     //  Has static connection
-                    TConnection connection = (TConnection)openNode.GetStaticConnection(i);
+                    TConnection connection = (TConnection)openNode.staticConnections[i];
                     if (connection != null)
                     {
                         ProcessConnection(openPathNode, connection);
@@ -73,7 +73,7 @@ namespace Com.Bit34Games.Graphs
             //  Iterate dynamic connections on node
             if (pathConfig.useDynamicConnections)
             {
-                IEnumerator<GraphConnection> connections = openNode.GetDynamicConnectionEnumerator();
+                IEnumerator<GraphConnection> connections = openNode.dynamicConnections.GetEnumerator();
                 while (connections.MoveNext())
                 {
                     GraphConnection connection = connections.Current;
