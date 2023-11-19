@@ -1,8 +1,8 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
     public abstract class RectGraphConfig<TNode, TConnection> : GridGraphConfig<TNode, TConnection>
-        where TNode : RectGraphNode<TConnection>
-        where TConnection : RectGraphConnection
+        where TNode : RectNode<TConnection>
+        where TConnection : RectConnection
     {
         //  MEMBERS
         public readonly bool isYAxisUp;
@@ -22,6 +22,6 @@
         }
 
         //  METHODS
-        abstract public void InitializeNode(RectGraphNode<TConnection> node, int column, int row);
+        abstract public void InitializeNode(RectNode<TConnection> node, int column, int row);
     }
 }

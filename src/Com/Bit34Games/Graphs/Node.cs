@@ -4,8 +4,8 @@
 namespace Com.Bit34Games.Graphs
 {
 
-    public class GraphNode<TConnection>
-        where TConnection : GraphConnection
+    public class Node<TConnection>
+        where TConnection : Connection
     {
         //  MEMBERS
         public int Id                     { get; private set; }
@@ -13,13 +13,13 @@ namespace Com.Bit34Games.Graphs
         public int StaticConnectionCount  { get { return staticConnections.Length; } }
         public int DynamicConnectionCount { get { return dynamicConnections.Count; } }
         //      Internal
-        internal IGraphNodeOwner         ownerGraph;
+        internal INodeOwner         ownerGraph;
         internal TConnection[]           staticConnections;
         internal LinkedList<TConnection> dynamicConnections;
 
 
         //  CONSTRUCTORS
-        public GraphNode()
+        public Node()
         {
             dynamicConnections = new LinkedList<TConnection>();
         }
@@ -49,7 +49,7 @@ namespace Com.Bit34Games.Graphs
             return dynamicConnections.GetEnumerator();
         }
 
-        public GraphConnection GetDynamicConnectionTo(int nodeId)
+        public Connection GetDynamicConnectionTo(int nodeId)
         {
             IEnumerator<TConnection> connections = dynamicConnections.GetEnumerator();
 
@@ -63,7 +63,7 @@ namespace Com.Bit34Games.Graphs
             return null;
         }
         
-        internal void AddedToGraph(IGraphNodeOwner owner, int id, int runtimeIndex, int staticConnectionCount)
+        internal void AddedToGraph(INodeOwner owner, int id, int runtimeIndex, int staticConnectionCount)
         {
             this.ownerGraph    = owner;
             Id                 = id;

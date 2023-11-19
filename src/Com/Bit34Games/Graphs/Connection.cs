@@ -1,6 +1,6 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class GraphConnection
+    public class Connection
     {
         //  MEMBERS
         public int             SourceNodeId { get; private set; }
@@ -10,11 +10,11 @@
         public int             TargetNodeRuntimeIndex { get; private set; }
         public int             TargetConnectionIndex { get; private set; }
         public float           Weight { get; private set; }
-        public GraphConnection Opposite { get; private set; }
+        public Connection Opposite { get; private set; }
 
 
         //  CONSTRUCTORS
-        public GraphConnection()
+        public Connection()
         { }
 
 
@@ -31,7 +31,7 @@
                           int             targetNodeRuntimeIndex,
                           int             targetConnectionIndex,
                           float           weight,
-                          GraphConnection opposite)
+                          Connection opposite)
         {
             SourceNodeId           = sourceNodeId;
             SourceNodeRuntimeIndex = sourceNodeRuntimeIndex;

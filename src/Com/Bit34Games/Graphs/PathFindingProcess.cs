@@ -3,8 +3,8 @@ using System.Collections.Generic;
 namespace Com.Bit34Games.Graphs
 {
     internal class PathFindingProcess<TNode, TConnection>
-        where TNode : GraphNode<TConnection>
-        where TConnection : GraphConnection
+        where TNode : Node<TConnection>
+        where TConnection : Connection
     {
         //  MEMBERS
         public readonly TNode                          startNode;
@@ -25,7 +25,7 @@ namespace Com.Bit34Games.Graphs
             this.endNode      = endNode;
             this.pathConfig   = pathConfig;
             this.agent        = agent;
-            _pathNodes        = new PathNode[agent.ownerGraph.NodeRuntimeIndexCounter];
+            _pathNodes        = new PathNode[agent.owner.NodeRuntimeIndexCounter];
             _openPathNodeList = new LinkedList<PathNode>();
 
             Initialize();
@@ -53,7 +53,7 @@ namespace Com.Bit34Games.Graphs
         {
             //  Remove node and mark as closed
             PathNode openPathNode = PickOpenNodeWithLowestWeight();
-            TNode    openNode     = agent.ownerGraph.GetNode(openPathNode.id);
+            TNode    openNode     = agent.owner.GetNode(openPathNode.id);
             openPathNode.isClosed = true;
 
             //  Iterate static connections of node
@@ -73,10 +73,10 @@ namespace Com.Bit34Games.Graphs
             //  Iterate dynamic connections on node
             if (pathConfig.useDynamicConnections)
             {
-                IEnumerator<GraphConnection> connections = openNode.dynamicConnections.GetEnumerator();
+                IEnumerator<Connection> connections = openNode.dynamicConnections.GetEnumerator();
                 while (connections.MoveNext())
                 {
-                    GraphConnection connection = connections.Current;
+                    Connection connection = connections.Current;
                     ProcessConnection(openPathNode, connection);
                 }
             }
@@ -127,7 +127,7 @@ namespace Com.Bit34Games.Graphs
             return node;
         }
 
-        private void ProcessConnection(PathNode openNode, GraphConnection connection)
+        private void ProcessConnection(PathNode openNode, Connection connection)
         {
             if (pathConfig.isConnectionAccessible != null && 
                 pathConfig.isConnectionAccessible(connection, agent) == false)
@@ -141,7 +141,7 @@ namespace Com.Bit34Games.Graphs
             //  If node is not visited
             if (targetPathNode == null)
             {
-                TNode targetNode                   = agent.ownerGraph.GetNode(connection.TargetNodeId);
+                TNode targetNode                   = agent.owner.GetNode(connection.TargetNodeId);
                 targetPathNode                     = new PathNode(targetNode.Id, targetNode.RuntimeIndex);
                 targetPathNode.weight              = weightToTargetNode;
                 targetPathNode.selectedConnection  = connection;

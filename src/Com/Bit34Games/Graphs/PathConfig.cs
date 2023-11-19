@@ -3,23 +3,23 @@
 namespace Com.Bit34Games.Graphs
 {
     public class PathConfig<TNode, TConnection>
-        where TNode : GraphNode<TConnection>
-        where TConnection : GraphConnection
+        where TNode : Node<TConnection>
+        where TConnection : Connection
     {
         //  DELEGATES
-        public delegate bool ConnectionAgentDelegate(GraphConnection connection, IAgentPathOwner pathOwner);
+        public delegate bool ConnectionAgentDelegate(Connection connection, IPathOwner pathOwner);
 
 
         //  MEMBERS
         public readonly bool useStaticConnections;
         public readonly bool useDynamicConnections;
-        public readonly Func<GraphConnection,IAgentPathOwner,bool> isConnectionAccessible;
+        public readonly Func<Connection,IPathOwner,bool> isConnectionAccessible;
 
 
         //  CONSTRUCTOR(S)
         public PathConfig(bool useStaticConnections=true, 
                           bool useDynamicConnections=true, 
-                          Func<GraphConnection,IAgentPathOwner,bool> isConnectionAccessible=null)
+                          Func<Connection,IPathOwner,bool> isConnectionAccessible=null)
         {
             this.useStaticConnections   = useStaticConnections;
             this.useDynamicConnections  = useDynamicConnections;

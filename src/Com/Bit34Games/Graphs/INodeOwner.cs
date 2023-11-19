@@ -1,5 +1,5 @@
 namespace Com.Bit34Games.Graphs
 {
-    public interface IGraphNodeOwner
+    public interface INodeOwner
     {}
 }

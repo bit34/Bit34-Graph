@@ -3,7 +3,7 @@
 
 namespace Com.Bit34Games.Graphs
 {
-    public class GraphNodeGroup
+    public class NodeGroup
     {
         //  MEMBERS
         public int NodeCount { get { return _nodeIds.Count; } }
@@ -11,7 +11,7 @@ namespace Com.Bit34Games.Graphs
 
 
         //  CONSTRUCTORS
-        public GraphNodeGroup()
+        public NodeGroup()
         {
             _nodeIds = new HashSet<int>();
         }
@@ -28,7 +28,7 @@ namespace Com.Bit34Games.Graphs
             _nodeIds.Remove(nodeId);
         }
 
-        public void Append(GraphNodeGroup group)
+        public void Append(NodeGroup group)
         {
             IEnumerator<int> nodeIds = group.GetEnumerator();
             while (nodeIds.MoveNext())

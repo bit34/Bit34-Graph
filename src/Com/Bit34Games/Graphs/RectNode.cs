@@ -1,7 +1,7 @@
 namespace Com.Bit34Games.Graphs
 {
-    public class RectGraphNode<TConnection> : GridGraphNode<TConnection>
-        where TConnection : RectGraphConnection
+    public class RectNode<TConnection> : GridNode<TConnection>
+        where TConnection : RectConnection
     {
         //  MEMBERS
         public int Column { get; private set; }
@@ -9,7 +9,7 @@ namespace Com.Bit34Games.Graphs
 
 
         //  CONSTRUCTORS
-        public RectGraphNode() {}
+        public RectNode() {}
 
 
         //  METHODS   

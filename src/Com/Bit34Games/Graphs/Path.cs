@@ -7,13 +7,13 @@
         public readonly int endNodeId;
         public int          ConnectionCount { get { return _connections.Length; } }
         //      private
-        private GraphConnection[] _connections;
+        private Connection[] _connections;
 
 
         //  CONSTRUCTOR(S)
         public Path(int               startNodeId, 
                     int               endNodeId,
-                    GraphConnection[] connections)
+                    Connection[] connections)
         {
             this.startNodeId = startNodeId;
             this.endNodeId   = endNodeId;
@@ -22,7 +22,7 @@
 
 
         //  METHODS
-        public GraphConnection Getconnection(int index)
+        public Connection Getconnection(int index)
         {
             return _connections[index];
         }

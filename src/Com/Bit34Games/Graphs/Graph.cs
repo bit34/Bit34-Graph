@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace Com.Bit34Games.Graphs
 {
     public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode, TConnection>,
-                                                      IGraphNodeOwner
+                                                      INodeOwner
         where TConfig : GraphConfig<TNode, TConnection>
-        where TNode : GraphNode<TConnection>
-        where TConnection : GraphConnection
+        where TNode : Node<TConnection>
+        where TConnection : Connection
     {
         //	MEMBERS
         public bool             IsFixed { get; protected set; }
@@ -246,6 +246,8 @@ namespace Com.Bit34Games.Graphs
         
 #endregion
 
+#region Agent Methods
+    
         public void AddAgent(Agent<TNode, TConnection> agent)
         {
             _agents.AddLast(agent);
@@ -258,5 +260,6 @@ namespace Com.Bit34Games.Graphs
             agent.RemovedFromGraph();
         }
 
+#endregion
     }
 }

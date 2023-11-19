@@ -1,28 +1,28 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class Agent<TNode, TConnection> : IAgentPathOwner
-        where TNode : GraphNode<TConnection>
-        where TConnection : GraphConnection
+    public class Agent<TNode, TConnection> : IPathOwner
+        where TNode : Node<TConnection>
+        where TConnection : Connection
     {
         //  MEMBERS
-        internal IAgentOwner<TNode, TConnection> ownerGraph;
+        internal IAgentOwner<TNode, TConnection> owner;
 
         //  METHODS
-        internal void AddedToGraph(IAgentOwner<TNode, TConnection> ownerGraph)
+        internal void AddedToGraph(IAgentOwner<TNode, TConnection> owner)
         {
-            this.ownerGraph = ownerGraph;
+            this.owner = owner;
         }
 
         internal void RemovedFromGraph()
         {
-            ownerGraph = null;
+            owner = null;
         }
 
         public Path FindPath(int                            startNodeId, 
                              int                            targetNodeId, 
                              PathConfig<TNode, TConnection> pathConfig)
         {
-            return FindPath(ownerGraph.GetNode(startNodeId), ownerGraph.GetNode(targetNodeId), pathConfig);
+            return FindPath(owner.GetNode(startNodeId), owner.GetNode(targetNodeId), pathConfig);
         }
 
         public Path FindPath(TNode                          startNode, 

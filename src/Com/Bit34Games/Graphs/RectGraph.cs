@@ -2,8 +2,8 @@
 {
     public class RectGraph<TConfig, TNode, TConnection> : GridGraph<TConfig, TNode, TConnection>
         where TConfig : RectGraphConfig<TNode, TConnection>
-        where TNode : RectGraphNode<TConnection>
-        where TConnection : RectGraphConnection
+        where TNode : RectNode<TConnection>
+        where TConnection : RectConnection
     {
         //  MEMBERS
         public readonly int columnCount;
@@ -75,10 +75,10 @@
 
         private void CreateStraightConnections()
         {
-            int horizontalConnection         = (int)RectGraphConnections.RIGHT;
+            int horizontalConnection         = (int)RectConnections.RIGHT;
             int horizontalOppositeConnection = GetOppositeConnection(horizontalConnection);
 
-            int verticalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.UP) : ((int)RectGraphConnections.DOWN);
+            int verticalConnection         = (Config.isYAxisUp) ? ((int)RectConnections.UP) : ((int)RectConnections.DOWN);
             int verticalOppositeConnection = GetOppositeConnection(verticalConnection);
 
             for (int c = 0; c < columnCount; c++)
@@ -100,10 +100,10 @@
 
         private void CreateDiagonalConnections()
         {
-            int rightDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.RIGHT_UP) : ((int)RectGraphConnections.RIGHT_DOWN);
+            int rightDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectConnections.RIGHT_UP) : ((int)RectConnections.RIGHT_DOWN);
             int rightDiagonalOppositeConnection = GetOppositeConnection(rightDiagonalConnection);
 
-            int leftDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectGraphConnections.LEFT_UP) : ((int)RectGraphConnections.LEFT_DOWN);
+            int leftDiagonalConnection         = (Config.isYAxisUp) ? ((int)RectConnections.LEFT_UP) : ((int)RectConnections.LEFT_DOWN);
             int leftDiagonalOppositeConnection = GetOppositeConnection(leftDiagonalConnection);
 
             for (int c = 0; c < columnCount; c++)

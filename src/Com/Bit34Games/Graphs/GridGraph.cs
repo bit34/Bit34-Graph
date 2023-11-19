@@ -2,8 +2,8 @@
 {
     public abstract class GridGraph<TConfig, TNode, TConnection> : Graph<TConfig, TNode, TConnection>
         where TConfig : GridGraphConfig<TNode, TConnection>
-        where TNode : GridGraphNode<TConnection>
-        where TConnection : GridGraphConnection
+        where TNode : GridNode<TConnection>
+        where TConnection : GridConnection
     {
         //  CONSTRUCTORS
         public GridGraph(TConfig config, IGraphAllocator<TNode, TConnection> allocator) :

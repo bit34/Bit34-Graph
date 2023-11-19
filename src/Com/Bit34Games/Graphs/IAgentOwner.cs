@@ -1,8 +1,8 @@
 namespace Com.Bit34Games.Graphs
 {
     public interface IAgentOwner<TNode, TConnection>
-        where TNode : GraphNode<TConnection>
-        where TConnection : GraphConnection
+        where TNode : Node<TConnection>
+        where TConnection : Connection
     {
         int NodeRuntimeIndexCounter{ get; }
         //  METHODS
