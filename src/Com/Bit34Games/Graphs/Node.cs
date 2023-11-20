@@ -9,7 +9,7 @@ namespace Com.Bit34Games.Graphs
     {
         //  MEMBERS
         public int Id               { get; private set; }
-        public int RuntimeIndex     { get; private set; }
+        public int Rid              { get; private set; }
         public int StaticEdgeCount  { get { return staticEdges.Length; } }
         public int DynamicEdgeCount { get { return dynamicEdges.Count; } }
         //      Internal
@@ -63,12 +63,12 @@ namespace Com.Bit34Games.Graphs
             return null;
         }
         
-        internal void AddedToGraph(INodeOwner owner, int id, int runtimeIndex, int statiEdgeCount)
+        internal void AddedToGraph(INodeOwner owner, int id, int rid, int statiEdgeCount)
         {
-            this.owner   = owner;
-            Id           = id;
-            RuntimeIndex = runtimeIndex;
-            staticEdges  = new TEdge[statiEdgeCount];
+            this.owner  = owner;
+            Id          = id;
+            Rid         = rid;
+            staticEdges = new TEdge[statiEdgeCount];
         }
 
         internal void RemovedFromGraph()

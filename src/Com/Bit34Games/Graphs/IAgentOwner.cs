@@ -4,7 +4,7 @@ namespace Com.Bit34Games.Graphs
         where TNode : Node<TEdge>
         where TEdge : Edge
     {
-        int NodeRuntimeIndexCounter{ get; }
+        int NodeRidCounter{ get; }
         //  METHODS
         TNode GetNode(int id);
     }

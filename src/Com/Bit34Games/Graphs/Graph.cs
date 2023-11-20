@@ -15,11 +15,11 @@ namespace Com.Bit34Games.Graphs
         public readonly TConfig Config;
         public int              NodeCount { get { return _nodes.Count; } }
         public int              NodeIdCounter { get; private set; }
-        public int              NodeRuntimeIndexCounter { get; private set;}
+        public int              NodeRidCounter { get; private set;}
         //      Private
         private readonly IGraphAllocator<TNode, TEdge> _allocator;
         private readonly Dictionary<int, TNode>        _nodes;
-        private LinkedList<int>                        _freeNodeRuntimeIndices;
+        private LinkedList<int>                        _freeNodeRids;
         private LinkedList<Agent<TNode, TEdge>>        _agents;
 
 
@@ -32,8 +32,8 @@ namespace Com.Bit34Games.Graphs
             _nodes         = new Dictionary<int, TNode>();
             NodeIdCounter  = -1;
 
-            NodeRuntimeIndexCounter = 0;
-            _freeNodeRuntimeIndices  = new LinkedList<int>();
+            NodeRidCounter = 0;
+            _freeNodeRids  = new LinkedList<int>();
 
             _agents = new LinkedList<Agent<TNode, TEdge>>();
         }
@@ -64,20 +64,20 @@ namespace Com.Bit34Games.Graphs
                 throw new Exception("Graph Exception:Cannot create node on a fixed graph");
             }
 
-            int runtimeIndex;
+            int rid;
 
-            if (_freeNodeRuntimeIndices.Count>0)
+            if (_freeNodeRids.Count>0)
             {
-                runtimeIndex = _freeNodeRuntimeIndices.Last.Value;
-                _freeNodeRuntimeIndices.RemoveLast();
+                rid = _freeNodeRids.Last.Value;
+                _freeNodeRids.RemoveLast();
             }
             else
             {
-                runtimeIndex = NodeRuntimeIndexCounter++;
+                rid = NodeRidCounter++;
             }
 
             TNode node = _allocator.CreateNode();
-            node.AddedToGraph(this, nodeId, runtimeIndex, Config.statiEdgeCount);
+            node.AddedToGraph(this, nodeId, rid, Config.statiEdgeCount);
             _nodes.Add(node.Id, node);
             NodeIdCounter = Math.Max(NodeIdCounter, node.Id);
 
@@ -124,7 +124,7 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Remove from graph
-            _freeNodeRuntimeIndices.AddLast(node.RuntimeIndex);
+            _freeNodeRids.AddLast(node.Rid);
             _nodes.Remove(node.Id);
             node.RemovedFromGraph();
 
@@ -170,8 +170,8 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Set Edges
-            edge.Set(source.Id, source.RuntimeIndex, sourceEdgeIndex, 
-                     target.Id, target.RuntimeIndex, targetEdgeIndex, 
+            edge.Set(source.Id, source.Rid, sourceEdgeIndex, 
+                     target.Id, target.Rid, targetEdgeIndex, 
                      Config.CalculateEdgeWeight(source, target), 
                      oppositeEdge);
 
@@ -191,8 +191,8 @@ namespace Com.Bit34Games.Graphs
             //  Set opposite edges
             if (createOpposite)
             {
-                oppositeEdge.Set(target.Id, target.RuntimeIndex, targetEdgeIndex, 
-                                       source.Id, source.RuntimeIndex, sourceEdgeIndex, 
+                oppositeEdge.Set(target.Id, target.Rid, targetEdgeIndex, 
+                                       source.Id, source.Rid, sourceEdgeIndex, 
                                        Config.CalculateEdgeWeight(target, source), 
                                        edge);
 

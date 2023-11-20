@@ -25,7 +25,7 @@ namespace Com.Bit34Games.Graphs
             this.endNode      = endNode;
             this.pathConfig   = pathConfig;
             this.agent        = agent;
-            _pathNodes        = new PathNode[agent.owner.NodeRuntimeIndexCounter];
+            _pathNodes        = new PathNode[agent.owner.NodeRidCounter];
             _openPathNodeList = new LinkedList<PathNode>();
 
             Initialize();
@@ -34,8 +34,8 @@ namespace Com.Bit34Games.Graphs
         //  METHODS
         private void Initialize()
         {
-            _pathNodes[startNode.RuntimeIndex] = new PathNode(startNode.Id, startNode.RuntimeIndex);
-            _openPathNodeList.AddLast(_pathNodes[startNode.RuntimeIndex]);
+            _pathNodes[startNode.Rid] = new PathNode(startNode.Id, startNode.Rid);
+            _openPathNodeList.AddLast(_pathNodes[startNode.Rid]);
         }
 
         public bool HasSteps()
@@ -45,8 +45,8 @@ namespace Com.Bit34Games.Graphs
 
         public bool EndReached()
         {
-            return _pathNodes[endNode.RuntimeIndex] != null && 
-                   _pathNodes[endNode.RuntimeIndex].isClosed;
+            return _pathNodes[endNode.Rid] != null && 
+                   _pathNodes[endNode.Rid].isClosed;
         }
 
         public void PerformStep()
@@ -86,12 +86,12 @@ namespace Com.Bit34Games.Graphs
             LinkedList<TEdge> edges = new LinkedList<TEdge>();
 
             //  Backtrack connections from end to start
-            TEdge edge = (TEdge)_pathNodes[endNode.RuntimeIndex].selectedEdge;
+            TEdge edge = (TEdge)_pathNodes[endNode.Rid].selectedEdge;
 
             do
             {
                 edges.AddFirst(edge);
-                edge = (TEdge)_pathNodes[edge.SourceNodeRuntimeIndex].selectedEdge;
+                edge = (TEdge)_pathNodes[edge.SourceNodeRid].selectedEdge;
             }
             while (edge != null);
 
@@ -134,17 +134,17 @@ namespace Com.Bit34Games.Graphs
                 return;
             }
 
-            PathNode targetPathNode     = _pathNodes[edge.TargetNodeRuntimeIndex];
+            PathNode targetPathNode     = _pathNodes[edge.TargetNodeRid];
             float    weightToTargetNode = openNode.weight + edge.Weight;
 
             //  If node is not visited
             if (targetPathNode == null)
             {
                 TNode targetNode            = agent.owner.GetNode(edge.TargetNodeId);
-                targetPathNode              = new PathNode(targetNode.Id, targetNode.RuntimeIndex);
+                targetPathNode              = new PathNode(targetNode.Id, targetNode.Rid);
                 targetPathNode.weight       = weightToTargetNode;
                 targetPathNode.selectedEdge = edge;
-                _pathNodes[targetPathNode.runtimeIndex] = targetPathNode;
+                _pathNodes[targetPathNode.rid] = targetPathNode;
                 _openPathNodeList.AddLast(targetPathNode);
             }
             else 
