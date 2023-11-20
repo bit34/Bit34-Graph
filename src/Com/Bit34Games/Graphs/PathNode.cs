@@ -5,7 +5,7 @@ namespace Com.Bit34Games.Graphs
         public readonly int id;
         public readonly int runtimeIndex;
         public float        weight;
-        public Connection   selectedConnection;
+        public Edge         selectedEdge;
         public bool         isClosed;
 
         public PathNode(int id, 

@@ -1,20 +1,20 @@
 namespace Com.Bit34Games.Graphs
 {
-    public abstract class GraphConfig<TNode, TConnection>
-        where TNode : Node<TConnection>
-        where TConnection : Connection
+    public abstract class GraphConfig<TNode, TEdge>
+        where TNode : Node<TEdge>
+        where TEdge : Edge
     {
         //  MEMBERS
-        public readonly int staticConnectionCount;
+        public readonly int statiEdgeCount;
 
 
         //  CONSTRUCTORS
-        public GraphConfig(int staticConnectionCount)
+        public GraphConfig(int staticEdgeCount)
         {
-            this.staticConnectionCount = staticConnectionCount;
+            this.statiEdgeCount = staticEdgeCount;
         }
 
         //  METHODS
-        abstract public float CalculateConnectionWeight(TNode sourceNode, TNode targetNode);
+        abstract public float CalculateEdgeWeight(TNode sourceNode, TNode targetNode);
     }
 }

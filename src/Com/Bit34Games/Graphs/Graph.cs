@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    public class Graph<TConfig, TNode, TConnection> : IAgentOwner<TNode, TConnection>,
-                                                      INodeOwner
-        where TConfig : GraphConfig<TNode, TConnection>
-        where TNode : Node<TConnection>
-        where TConnection : Connection
+    public class Graph<TConfig, TNode, TEdge> : IAgentOwner<TNode, TEdge>,
+                                                INodeOwner
+        where TConfig : GraphConfig<TNode, TEdge>
+        where TNode : Node<TEdge>
+        where TEdge : Edge
     {
         //	MEMBERS
         public bool             IsFixed { get; protected set; }
@@ -17,14 +17,14 @@ namespace Com.Bit34Games.Graphs
         public int              NodeIdCounter { get; private set; }
         public int              NodeRuntimeIndexCounter { get; private set;}
         //      Private
-        private readonly IGraphAllocator<TNode, TConnection> _allocator;
-        private readonly Dictionary<int, TNode>              _nodes;
-        private LinkedList<int>                              _freeNodeRuntimeIndices;
-        private LinkedList<Agent<TNode, TConnection>>        _agents;
+        private readonly IGraphAllocator<TNode, TEdge> _allocator;
+        private readonly Dictionary<int, TNode>        _nodes;
+        private LinkedList<int>                        _freeNodeRuntimeIndices;
+        private LinkedList<Agent<TNode, TEdge>>        _agents;
 
 
         //  CONSTRUCTORS
-        public Graph(TConfig config, IGraphAllocator<TNode, TConnection> allocator)
+        public Graph(TConfig config, IGraphAllocator<TNode, TEdge> allocator)
         {
             IsFixed        = false;
             Config         = config;
@@ -35,7 +35,7 @@ namespace Com.Bit34Games.Graphs
             NodeRuntimeIndexCounter = 0;
             _freeNodeRuntimeIndices  = new LinkedList<int>();
 
-            _agents = new LinkedList<Agent<TNode, TConnection>>();
+            _agents = new LinkedList<Agent<TNode, TEdge>>();
         }
 
 
@@ -77,7 +77,7 @@ namespace Com.Bit34Games.Graphs
             }
 
             TNode node = _allocator.CreateNode();
-            node.AddedToGraph(this, nodeId, runtimeIndex, Config.staticConnectionCount);
+            node.AddedToGraph(this, nodeId, runtimeIndex, Config.statiEdgeCount);
             _nodes.Add(node.Id, node);
             NodeIdCounter = Math.Max(NodeIdCounter, node.Id);
 
@@ -101,26 +101,26 @@ namespace Com.Bit34Games.Graphs
                 throw new Exception("Graph Exception:Cannot remove node from a fixed graph");
             }
 
-            if (node.ownerGraph != this)
+            if (node.owner != this)
             {
                 throw new Exception("Graph Exception:Cannot remove node, it does not belong to this graph");
             }
 
-            //  Remove referencing static connections
-            for (int i = 0; i < node.StaticConnectionCount; i++)
+            //  Remove referencing static edges
+            for (int i = 0; i < node.StaticEdgeCount; i++)
             {
-                TConnection connection = (TConnection)node.staticConnections[i];
-                if (connection != null)
+                TEdge edge = (TEdge)node.staticEdges[i];
+                if (edge != null)
                 {
-                    RemoveConnection(connection);
+                    RemoveEdge(edge);
                 }
             }
 
-            //  Remove referencing dynamic connections
-            while (node.DynamicConnectionCount>0)
+            //  Remove referencing dynamic edges
+            while (node.DynamicEdgeCount>0)
             {
-                TConnection connection = (TConnection)node.GetFirstDynamicConnection();
-                RemoveConnection(connection);
+                TEdge edge = (TEdge)node.GetFirstDynamicEdge();
+                RemoveEdge(edge);
             }
 
             //  Remove from graph
@@ -133,113 +133,113 @@ namespace Com.Bit34Games.Graphs
 
 #endregion
 
-#region Connection Methods
+#region Edge Methods
 
-        protected TConnection AddConnection(int  sourceNodeId,
-                                            int  targetNodeId,
-                                            int  sourceConnectionIndex = -1,
-                                            int  targetConnectionIndex = -1,
-                                            bool createOpposite = true)
+        protected TEdge AddEdge(int  sourceNodeId,
+                                int  targetNodeId,
+                                int  sourceEdgeIndex = -1,
+                                int  targetEdgeIndex = -1,
+                                bool createOpposite = true)
         {
-            return AddConnection(_nodes[sourceNodeId],
-                                 _nodes[targetNodeId],
-                                 sourceConnectionIndex,
-                                 targetConnectionIndex,
-                                 createOpposite);
+            return AddEdge(_nodes[sourceNodeId],
+                           _nodes[targetNodeId],
+                           sourceEdgeIndex,
+                           targetEdgeIndex,
+                           createOpposite);
         }
 
-        protected TConnection AddConnection(TNode source,
-                                            TNode target,
-                                            int   sourceConnectionIndex = -1,
-                                            int   targetConnectionIndex = -1,
-                                            bool  createOpposite = true)
+        protected TEdge AddEdge(TNode source,
+                                TNode target,
+                                int   sourceEdgeIndex = -1,
+                                int   targetEdgeIndex = -1,
+                                bool  createOpposite = true)
         {
-            if (source.ownerGraph != this || target.ownerGraph != this)
+            if (source.owner != this || target.owner != this)
             {
-                throw new Exception("Graph Exception:Cannot create connection, node(s) does not belong to this graph");
+                throw new Exception("Graph Exception:Cannot create edge, node(s) does not belong to this graph");
             }
 
-            //	Create connection
-            TConnection connection = _allocator.CreateConnection();
+            //	Create edge
+            TEdge edge = _allocator.CreateEdge();
 
-            //	Create opposite connection
-            TConnection oppositeConnection = null;
+            //	Create opposite edge
+            TEdge oppositeEdge = null;
             if (createOpposite)
             {
-                oppositeConnection = _allocator.CreateConnection();
+                oppositeEdge = _allocator.CreateEdge();
             }
 
-            //  Set connections
-            connection.Set(source.Id, source.RuntimeIndex, sourceConnectionIndex, 
-                           target.Id, target.RuntimeIndex, targetConnectionIndex, 
-                           Config.CalculateConnectionWeight(source, target), 
-                           oppositeConnection);
+            //  Set Edges
+            edge.Set(source.Id, source.RuntimeIndex, sourceEdgeIndex, 
+                     target.Id, target.RuntimeIndex, targetEdgeIndex, 
+                     Config.CalculateEdgeWeight(source, target), 
+                     oppositeEdge);
 
-            if (sourceConnectionIndex == -1)
+            if (sourceEdgeIndex == -1)
             {
-                source.AddDynamicConnection(connection);
+                source.AddDynamicEdge(edge);
             }
             else
             {
-                if (source.staticConnections[sourceConnectionIndex] != null)
+                if (source.staticEdges[sourceEdgeIndex] != null)
                 {
-                    RemoveConnection((TConnection)source.staticConnections[sourceConnectionIndex]);
+                    RemoveEdge((TEdge)source.staticEdges[sourceEdgeIndex]);
                 }
-                source.SetStaticConnection(sourceConnectionIndex, connection);
+                source.SetStaticEdge(sourceEdgeIndex, edge);
             }
 
-            //  Set opposite connections
+            //  Set opposite edges
             if (createOpposite)
             {
-                oppositeConnection.Set(target.Id, target.RuntimeIndex, targetConnectionIndex, 
-                                       source.Id, source.RuntimeIndex, sourceConnectionIndex, 
-                                       Config.CalculateConnectionWeight(target, source), 
-                                       connection);
+                oppositeEdge.Set(target.Id, target.RuntimeIndex, targetEdgeIndex, 
+                                       source.Id, source.RuntimeIndex, sourceEdgeIndex, 
+                                       Config.CalculateEdgeWeight(target, source), 
+                                       edge);
 
-                if (targetConnectionIndex == -1)
+                if (targetEdgeIndex == -1)
                 {
-                    target.AddDynamicConnection(oppositeConnection);
+                    target.AddDynamicEdge(oppositeEdge);
                 }
                 else
                 {
-                    if (target.staticConnections[targetConnectionIndex] != null)
+                    if (target.staticEdges[targetEdgeIndex] != null)
                     {
-                        RemoveConnection((TConnection)target.staticConnections[targetConnectionIndex]);
+                        RemoveEdge((TEdge)target.staticEdges[targetEdgeIndex]);
                     }
-                    target.SetStaticConnection(targetConnectionIndex, oppositeConnection);
+                    target.SetStaticEdge(targetEdgeIndex, oppositeEdge);
                 }
             }
 
-            return connection;
+            return edge;
         }
 
-        protected void RemoveConnection(TConnection connection, bool deleteOpposite = true)
+        protected void RemoveEdge(TEdge edge, bool deleteOpposite = true)
         {
-            //  invalidate connections
-            if (connection.SourceConnectionIndex == -1)
+            //  invalidate edges
+            if (edge.SourceEdgeIndex == -1)
             {
-                _nodes[connection.SourceNodeId].RemoveDynamicConnection(connection);
+                _nodes[edge.SourceNodeId].RemoveDynamicEdge(edge);
             }
             else
             {
-                _nodes[connection.SourceNodeId].SetStaticConnection(connection.SourceConnectionIndex, null);
+                _nodes[edge.SourceNodeId].SetStaticEdge(edge.SourceEdgeIndex, null);
             }
 
-            //  Remove connection
-            TConnection oppositeConnection = (TConnection)connection.Opposite;
-            connection.Reset();
-            _allocator.FreeConnection(connection);
+            //  Remove edge
+            TEdge oppositeEdge = (TEdge)edge.Opposite;
+            edge.Reset();
+            _allocator.FreeEdge(edge);
 
             //  Has an opposite
-            if (oppositeConnection != null)
+            if (oppositeEdge != null)
             {
-                //  Inform connection removal
-                oppositeConnection.OppositeRemoved();
+                //  Inform edge removal
+                oppositeEdge.OppositeRemoved();
 
                 //  If requested remove opposite, too
                 if (deleteOpposite == true)
                 {
-                    RemoveConnection(oppositeConnection);
+                    RemoveEdge(oppositeEdge);
                 }
             }
         }
@@ -248,13 +248,13 @@ namespace Com.Bit34Games.Graphs
 
 #region Agent Methods
     
-        public void AddAgent(Agent<TNode, TConnection> agent)
+        public void AddAgent(Agent<TNode, TEdge> agent)
         {
             _agents.AddLast(agent);
             agent.AddedToGraph(this);
         }
 
-        public void RemoveAgent(Agent<TNode, TConnection> agent)
+        public void RemoveAgent(Agent<TNode, TEdge> agent)
         {
             _agents.Remove(agent);
             agent.RemovedFromGraph();

@@ -5,26 +5,26 @@
         //  MEMBERS
         public readonly int startNodeId;
         public readonly int endNodeId;
-        public int          ConnectionCount { get { return _connections.Length; } }
+        public int          EdgeCount { get { return _edges.Length; } }
         //      private
-        private Connection[] _connections;
+        private Edge[] _edges;
 
 
         //  CONSTRUCTOR(S)
-        public Path(int               startNodeId, 
-                    int               endNodeId,
-                    Connection[] connections)
+        public Path(int    startNodeId, 
+                    int    endNodeId,
+                    Edge[] edges)
         {
             this.startNodeId = startNodeId;
             this.endNodeId   = endNodeId;
-            _connections     = connections;
+            _edges           = edges;
         }
 
 
         //  METHODS
-        public Connection Getconnection(int index)
+        public Edge GetEdge(int index)
         {
-            return _connections[index];
+            return _edges[index];
         }
 
     }

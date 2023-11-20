@@ -2,24 +2,24 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    internal class PathFindingProcess<TNode, TConnection>
-        where TNode : Node<TConnection>
-        where TConnection : Connection
+    internal class PathFindingProcess<TNode, TEdge>
+        where TNode : Node<TEdge>
+        where TEdge : Edge
     {
         //  MEMBERS
-        public readonly TNode                          startNode;
-        public readonly TNode                          endNode;
-        public readonly PathConfig<TNode, TConnection> pathConfig;
-        public readonly Agent<TNode, TConnection>      agent;
+        public readonly TNode                    startNode;
+        public readonly TNode                    endNode;
+        public readonly PathConfig<TNode, TEdge> pathConfig;
+        public readonly Agent<TNode, TEdge>      agent;
         //      Private
         private readonly PathNode[]           _pathNodes;
         private readonly LinkedList<PathNode> _openPathNodeList;
 
         //  CONSTRUCTORS
-        public PathFindingProcess(TNode                          startNode,
-                                  TNode                          endNode,
-                                  PathConfig<TNode, TConnection> pathConfig,
-                                  Agent<TNode, TConnection>      agent)
+        public PathFindingProcess(TNode                    startNode,
+                                  TNode                    endNode,
+                                  PathConfig<TNode, TEdge> pathConfig,
+                                  Agent<TNode, TEdge>      agent)
         {
             this.startNode    = startNode;
             this.endNode      = endNode;
@@ -56,56 +56,55 @@ namespace Com.Bit34Games.Graphs
             TNode    openNode     = agent.owner.GetNode(openPathNode.id);
             openPathNode.isClosed = true;
 
-            //  Iterate static connections of node
-            if (pathConfig.useStaticConnections)
+            //  Iterate static edges of node
+            if (pathConfig.useStaticEdges)
             {
-                for (int i = openNode.StaticConnectionCount - 1; i >= 0; i--)
+                for (int i = openNode.StaticEdgeCount - 1; i >= 0; i--)
                 {
-                    //  Has static connection
-                    TConnection connection = (TConnection)openNode.staticConnections[i];
-                    if (connection != null)
+                    //  Has static edge
+                    TEdge edge = (TEdge)openNode.staticEdges[i];
+                    if (edge != null)
                     {
-                        ProcessConnection(openPathNode, connection);
+                        ProcessEdge(openPathNode, edge);
                     }
                 }
             }
 
-            //  Iterate dynamic connections on node
-            if (pathConfig.useDynamicConnections)
+            //  Iterate dynamic edges on node
+            if (pathConfig.useDynamicEdges)
             {
-                IEnumerator<Connection> connections = openNode.dynamicConnections.GetEnumerator();
-                while (connections.MoveNext())
+                IEnumerator<Edge> edge = openNode.dynamicEdges.GetEnumerator();
+                while (edge.MoveNext())
                 {
-                    Connection connection = connections.Current;
-                    ProcessConnection(openPathNode, connection);
+                    ProcessEdge(openPathNode, edge.Current);
                 }
             }
         }
 
-        public TConnection[] BacktrackConnections()
+        public TEdge[] BacktrackEdges()
         {
-            LinkedList<TConnection> connections = new LinkedList<TConnection>();
+            LinkedList<TEdge> edges = new LinkedList<TEdge>();
 
             //  Backtrack connections from end to start
-            TConnection connection = (TConnection)_pathNodes[endNode.RuntimeIndex].selectedConnection;
+            TEdge edge = (TEdge)_pathNodes[endNode.RuntimeIndex].selectedEdge;
 
             do
             {
-                connections.AddFirst(connection);
-                connection = (TConnection)_pathNodes[connection.SourceNodeRuntimeIndex].selectedConnection;
+                edges.AddFirst(edge);
+                edge = (TEdge)_pathNodes[edge.SourceNodeRuntimeIndex].selectedEdge;
             }
-            while (connection != null);
+            while (edge != null);
 
-            TConnection[] connectionsArray = new TConnection[connections.Count];
-            LinkedListNode<TConnection> connectionNode = connections.First;
+            TEdge[] edgesArray = new TEdge[edges.Count];
+            LinkedListNode<TEdge> edgeNode = edges.First;
             int i = 0;
-            while(connectionNode != null)
+            while(edgeNode != null)
             {
-                connectionsArray[i++] = connectionNode.Value;
-                connectionNode = connectionNode.Next;
+                edgesArray[i++] = edgeNode.Value;
+                edgeNode = edgeNode.Next;
             }
 
-            return connectionsArray;
+            return edgesArray;
         }
 
         private PathNode PickOpenNodeWithLowestWeight()
@@ -127,24 +126,24 @@ namespace Com.Bit34Games.Graphs
             return node;
         }
 
-        private void ProcessConnection(PathNode openNode, Connection connection)
+        private void ProcessEdge(PathNode openNode, Edge edge)
         {
-            if (pathConfig.isConnectionAccessible != null && 
-                pathConfig.isConnectionAccessible(connection, agent) == false)
+            if (pathConfig.isEdgeAccessible != null && 
+                pathConfig.isEdgeAccessible(edge, agent) == false)
             {
                 return;
             }
 
-            PathNode targetPathNode     = _pathNodes[connection.TargetNodeRuntimeIndex];
-            float    weightToTargetNode = openNode.weight + connection.Weight;
+            PathNode targetPathNode     = _pathNodes[edge.TargetNodeRuntimeIndex];
+            float    weightToTargetNode = openNode.weight + edge.Weight;
 
             //  If node is not visited
             if (targetPathNode == null)
             {
-                TNode targetNode                   = agent.owner.GetNode(connection.TargetNodeId);
-                targetPathNode                     = new PathNode(targetNode.Id, targetNode.RuntimeIndex);
-                targetPathNode.weight              = weightToTargetNode;
-                targetPathNode.selectedConnection  = connection;
+                TNode targetNode            = agent.owner.GetNode(edge.TargetNodeId);
+                targetPathNode              = new PathNode(targetNode.Id, targetNode.RuntimeIndex);
+                targetPathNode.weight       = weightToTargetNode;
+                targetPathNode.selectedEdge = edge;
                 _pathNodes[targetPathNode.runtimeIndex] = targetPathNode;
                 _openPathNodeList.AddLast(targetPathNode);
             }
@@ -153,8 +152,8 @@ namespace Com.Bit34Games.Graphs
             {
                 if (targetPathNode.weight > weightToTargetNode)
                 {
-                    targetPathNode.weight             = weightToTargetNode;
-                    targetPathNode.selectedConnection = connection;
+                    targetPathNode.weight       = weightToTargetNode;
+                    targetPathNode.selectedEdge = edge;
                 }
             }
         }

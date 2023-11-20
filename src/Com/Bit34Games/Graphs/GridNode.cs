@@ -1,6 +1,6 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class GridNode<TConnection> : Node<TConnection>
-        where TConnection : GridConnection
+    public class GridNode<TEdge> : Node<TEdge>
+        where TEdge : GridEdge
     {}
 }

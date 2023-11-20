@@ -1,20 +1,20 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public abstract class GridGraph<TConfig, TNode, TConnection> : Graph<TConfig, TNode, TConnection>
-        where TConfig : GridGraphConfig<TNode, TConnection>
-        where TNode : GridNode<TConnection>
-        where TConnection : GridConnection
+    public abstract class GridGraph<TConfig, TNode, TEdge> : Graph<TConfig, TNode, TEdge>
+        where TConfig : GridGraphConfig<TNode, TEdge>
+        where TNode : GridNode<TEdge>
+        where TEdge : GridEdge
     {
         //  CONSTRUCTORS
-        public GridGraph(TConfig config, IGraphAllocator<TNode, TConnection> allocator) :
+        public GridGraph(TConfig config, IGraphAllocator<TNode, TEdge> allocator) :
             base(config, allocator)
         {}
 
 
         //  METHODS
-        public int GetOppositeConnection(int connection)
+        public int GetOppositeEdge(int edge)
         {
-            return (connection + (Config.staticConnectionCount / 2)) % Config.staticConnectionCount;
+            return (edge + (Config.statiEdgeCount / 2)) % Config.statiEdgeCount;
         }
 
     }

@@ -1,14 +1,14 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class Agent<TNode, TConnection> : IPathOwner
-        where TNode : Node<TConnection>
-        where TConnection : Connection
+    public class Agent<TNode, TEdge> : IPathOwner
+        where TNode : Node<TEdge>
+        where TEdge : Edge
     {
         //  MEMBERS
-        internal IAgentOwner<TNode, TConnection> owner;
+        internal IAgentOwner<TNode, TEdge> owner;
 
         //  METHODS
-        internal void AddedToGraph(IAgentOwner<TNode, TConnection> owner)
+        internal void AddedToGraph(IAgentOwner<TNode, TEdge> owner)
         {
             this.owner = owner;
         }
@@ -18,21 +18,21 @@
             owner = null;
         }
 
-        public Path FindPath(int                            startNodeId, 
-                             int                            targetNodeId, 
-                             PathConfig<TNode, TConnection> pathConfig)
+        public Path FindPath(int                      startNodeId, 
+                             int                      targetNodeId, 
+                             PathConfig<TNode, TEdge> pathConfig)
         {
             return FindPath(owner.GetNode(startNodeId), owner.GetNode(targetNodeId), pathConfig);
         }
 
-        public Path FindPath(TNode                          startNode, 
-                             TNode                          endNode, 
-                             PathConfig<TNode, TConnection> pathConfig)
+        public Path FindPath(TNode                    startNode, 
+                             TNode                    endNode, 
+                             PathConfig<TNode, TEdge> pathConfig)
         {
-            PathFindingProcess<TNode, TConnection> process = new PathFindingProcess<TNode, TConnection>(startNode, 
-                                                                                                        endNode, 
-                                                                                                        pathConfig, 
-                                                                                                        this);
+            PathFindingProcess<TNode, TEdge> process = new PathFindingProcess<TNode, TEdge>(startNode, 
+                                                                                            endNode, 
+                                                                                            pathConfig, 
+                                                                                            this);
 
             //  Iterate open nodes until end node is reached or no open nodes left in queue
             while (process.HasSteps())
@@ -43,7 +43,7 @@
             //  Is end node reached
             if (process.EndReached())
             {
-                return new Path(process.startNode.Id, process.endNode.Id, process.BacktrackConnections());
+                return new Path(process.startNode.Id, process.endNode.Id, process.BacktrackEdges());
             }
 
             //  No valid path
