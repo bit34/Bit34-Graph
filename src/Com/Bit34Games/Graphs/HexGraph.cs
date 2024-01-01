@@ -1,35 +1,33 @@
 namespace Com.Bit34Games.Graphs
 {
-    public class HexGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
-        where TConfig : HexGraphConfig<TNode, TEdge>
+    public abstract class HexGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
         where TNode : HexNode<TEdge>
         where TEdge : HexEdge
     {
         //  MEMBERS
-        public readonly int columnCount;
-        public readonly int rowCount;
+        public readonly bool isYAxisUp;
+        public readonly int  columnCount;
+        public readonly int  rowCount;
         //      Internal
         private TNode[] _nodes;
 
 
         //  CONSTRUCTOR(S)
-        public HexGraph(TConfig                       config,
-                        IGraphAllocator<TNode, TEdge> allocator,
+        public HexGraph(IGraphAllocator<TNode, TEdge> allocator,
+                        bool                          isYAxisUp,
                         int                           columnCount,
                         int                           rowCount) :
-            base(config, allocator)
+            base(allocator, 6)
         {
+            this.isYAxisUp   = isYAxisUp;
             this.columnCount = columnCount;
             this.rowCount    = rowCount;
-
-            CreateNodes();
-            CreateEdges();
-
-            IsFixed = true;
         }
 
 
         //  METHODS
+        abstract protected void InitializeNode(HexNode<TEdge> node, int column, int row);
+
         public TNode GetNodeByLocation( int column, int row)
         {
             return _nodes[column+(row*columnCount)];
@@ -44,7 +42,7 @@ namespace Com.Bit34Games.Graphs
             return null;
         }
 
-        private void CreateNodes()
+        protected void CreateNodes()
         {
             _nodes = new TNode[columnCount* rowCount];
 
@@ -54,13 +52,13 @@ namespace Com.Bit34Games.Graphs
                 {
                     TNode node = AddNode();
                     node.SetLocation(c, r);
-                    Config.InitializeNode(node, c, r);
+                    InitializeNode(node, c, r);
                     _nodes[columnCount*r+c] = node;
                 }
             }
         }
 
-        private void CreateEdges()
+        protected void CreateEdges()
         {
             int horizontalEdge         = (int)HexEdgeDirections.RIGHT;
             int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);

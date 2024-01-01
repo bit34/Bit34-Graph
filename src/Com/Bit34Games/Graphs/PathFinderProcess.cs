@@ -2,42 +2,39 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    internal class PathFindingProcess<TNode, TEdge>
+    internal class PathFinderProcess<TAgent, TNode, TEdge>
+        where TAgent : Agent<TNode, TEdge>
         where TNode : Node<TEdge>
         where TEdge : Edge
     {
         //  MEMBERS
-        public readonly TNode                    startNode;
-        public readonly TNode                    endNode;
-        public readonly PathConfig<TNode, TEdge> pathConfig;
-        public readonly Agent<TNode, TEdge>      agent;
+        public readonly PathFinder<TAgent, TNode, TEdge> pathFinder;
+        public readonly TAgent                           agent;
+        public readonly TNode                            startNode;
+        public readonly TNode                            endNode;
         //      Private
         private readonly PathNode[]           _pathNodes;
         private readonly LinkedList<PathNode> _openPathNodeList;
 
         //  CONSTRUCTORS
-        public PathFindingProcess(TNode                    startNode,
-                                  TNode                    endNode,
-                                  PathConfig<TNode, TEdge> pathConfig,
-                                  Agent<TNode, TEdge>      agent)
+        public PathFinderProcess(PathFinder<TAgent, TNode, TEdge> pathFinder,
+                                  TAgent                          agent,
+                                  TNode                           startNode,
+                                  TNode                           endNode)
         {
-            this.startNode    = startNode;
+            this.pathFinder   = pathFinder;
             this.endNode      = endNode;
-            this.pathConfig   = pathConfig;
+            this.startNode    = startNode;
             this.agent        = agent;
             _pathNodes        = new PathNode[agent.owner.NodeRidCounter];
             _openPathNodeList = new LinkedList<PathNode>();
 
-            Initialize();
-        }
-
-        //  METHODS
-        private void Initialize()
-        {
+            //  Initialize
             _pathNodes[startNode.Rid] = new PathNode(startNode.Id, startNode.Rid);
             _openPathNodeList.AddLast(_pathNodes[startNode.Rid]);
         }
 
+        //  METHODS
         public bool HasSteps()
         {
             return _openPathNodeList.Count > 0;
@@ -57,7 +54,7 @@ namespace Com.Bit34Games.Graphs
             openPathNode.isClosed = true;
 
             //  Iterate static edges of node
-            if (pathConfig.useStaticEdges)
+            if (pathFinder.useStaticEdges)
             {
                 for (int i = openNode.StaticEdgeCount - 1; i >= 0; i--)
                 {
@@ -71,9 +68,9 @@ namespace Com.Bit34Games.Graphs
             }
 
             //  Iterate dynamic edges on node
-            if (pathConfig.useDynamicEdges)
+            if (pathFinder.useDynamicEdges)
             {
-                IEnumerator<Edge> edge = openNode.dynamicEdges.GetEnumerator();
+                IEnumerator<TEdge> edge = openNode.dynamicEdges.GetEnumerator();
                 while (edge.MoveNext())
                 {
                     ProcessEdge(openPathNode, edge.Current);
@@ -126,10 +123,9 @@ namespace Com.Bit34Games.Graphs
             return node;
         }
 
-        private void ProcessEdge(PathNode openNode, Edge edge)
+        private void ProcessEdge(PathNode openNode, TEdge edge)
         {
-            if (pathConfig.isEdgeAccessible != null && 
-                pathConfig.isEdgeAccessible(edge, agent) == false)
+            if (pathFinder.CanAgentAccessEdge(agent, edge) == false)
             {
                 return;
             }

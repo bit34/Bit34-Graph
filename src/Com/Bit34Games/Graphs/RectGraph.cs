@@ -1,35 +1,38 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public class RectGraph<TConfig, TNode, TEdge> : GridGraph<TConfig, TNode, TEdge>
-        where TConfig : RectGraphConfig<TNode, TEdge>
+    public abstract class RectGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
         where TNode : RectNode<TEdge>
         where TEdge : RectEdge
     {
         //  MEMBERS
-        public readonly int columnCount;
-        public readonly int rowCount;
+        public readonly bool isYAxisUp;
+        public readonly bool hasStraightEdges;
+        public readonly bool hasDiagonalEdges;
+        public readonly int  columnCount;
+        public readonly int  rowCount;
         //      Internal
         private TNode[] _nodes;
 
 
         //  CONSTRUCTOR(S)
-        public RectGraph(TConfig                       config,
-                         IGraphAllocator<TNode, TEdge> allocator,
+        public RectGraph(IGraphAllocator<TNode, TEdge> allocator,
+                         bool                          isYAxisUp,
+                         bool                          hasStraightEdges,
+                         bool                          hasDiagonalEdges,
                          int                           columnCount,
                          int                           rowCount) :
-            base(config, allocator)
+            base(allocator, 8)
         {
-            this.columnCount = columnCount;
-            this.rowCount    = rowCount;
-
-            CreateNodes();
-            CreateEdges();
-
-            IsFixed = true;
+            this.isYAxisUp        = isYAxisUp;
+            this.hasStraightEdges = hasStraightEdges;
+            this.hasDiagonalEdges = hasDiagonalEdges;
+            this.columnCount      = columnCount;
+            this.rowCount         = rowCount;
         }
 
 
         //  METHODS
+        abstract protected void InitializeNode(RectNode<TEdge> node, int column, int row);
         public TNode GetNodeByLocation( int column, int row)
         {
             return _nodes[column+(row*columnCount)];
@@ -44,7 +47,7 @@
             return null;
         }
 
-        private void CreateNodes()
+        protected void CreateNodes()
         {
             _nodes = new TNode[columnCount* rowCount];
 
@@ -54,20 +57,20 @@
                 {
                     TNode node = AddNode();
                     node.SetLocation(c, r);
-                    Config.InitializeNode(node, c, r);
+                    InitializeNode(node, c, r);
                     _nodes[columnCount*r+c] = node;
                 }
             }
         }
 
-        private void CreateEdges()
+        protected void CreateEdges()
         {
-            if (Config.hasStraightEdges == true)
+            if (hasStraightEdges == true)
             {
                 CreateStraightEdges();
             }
 
-            if (Config.hasDiagonalEdges == true)
+            if (hasDiagonalEdges == true)
             {
                 CreateDiagonalEdges();
             }
@@ -78,7 +81,7 @@
             int horizontalEdge         = (int)RectEdgeDirections.RIGHT;
             int horizontalOppositeEdge = GetOppositeEdge(horizontalEdge);
 
-            int verticalEdge         = (Config.isYAxisUp) ? ((int)RectEdgeDirections.UP) : ((int)RectEdgeDirections.DOWN);
+            int verticalEdge         = (isYAxisUp) ? ((int)RectEdgeDirections.UP) : ((int)RectEdgeDirections.DOWN);
             int verticalOppositeEdge = GetOppositeEdge(verticalEdge);
 
             for (int c = 0; c < columnCount; c++)
@@ -100,10 +103,10 @@
 
         private void CreateDiagonalEdges()
         {
-            int rightDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectEdgeDirections.RIGHT_UP) : ((int)RectEdgeDirections.RIGHT_DOWN);
+            int rightDiagonalEdge         = (isYAxisUp) ? ((int)RectEdgeDirections.RIGHT_UP) : ((int)RectEdgeDirections.RIGHT_DOWN);
             int rightDiagonalOppositeEdge = GetOppositeEdge(rightDiagonalEdge);
 
-            int leftDiagonalEdge         = (Config.isYAxisUp) ? ((int)RectEdgeDirections.LEFT_UP) : ((int)RectEdgeDirections.LEFT_DOWN);
+            int leftDiagonalEdge         = (isYAxisUp) ? ((int)RectEdgeDirections.LEFT_UP) : ((int)RectEdgeDirections.LEFT_DOWN);
             int leftDiagonalOppositeEdge = GetOppositeEdge(leftDiagonalEdge);
 
             for (int c = 0; c < columnCount; c++)
