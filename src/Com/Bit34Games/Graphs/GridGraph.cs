@@ -6,8 +6,8 @@
         where TAgent : Agent<TNode, TEdge>
     {
         //  CONSTRUCTORS
-        public GridGraph(IGraphAllocator<TNode, TEdge> allocator, int staticEdgeCount) :
-            base(allocator, staticEdgeCount)
+        public GridGraph(int staticEdgeCount) :
+            base(staticEdgeCount)
         {}
 
 

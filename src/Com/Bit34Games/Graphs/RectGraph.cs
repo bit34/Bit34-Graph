@@ -15,14 +15,13 @@
         private TNode[] _nodes;
 
 
-        //  CONSTRUCTOR(S)
-        public RectGraph(IGraphAllocator<TNode, TEdge> allocator,
-                         bool                          isYAxisUp,
-                         bool                          hasStraightEdges,
-                         bool                          hasDiagonalEdges,
-                         int                           columnCount,
-                         int                           rowCount) :
-            base(allocator, 8)
+        //  CONSTRUCTORS
+        public RectGraph(bool isYAxisUp,
+                         bool hasStraightEdges,
+                         bool hasDiagonalEdges,
+                         int  columnCount,
+                         int  rowCount) :
+            base(8)
         {
             this.isYAxisUp        = isYAxisUp;
             this.hasStraightEdges = hasStraightEdges;

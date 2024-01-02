@@ -17,23 +17,21 @@ namespace Com.Bit34Games.Graphs
         public int          NodeRidCounter { get; private set;}
         public readonly int staticEdgeCount;
         //      Private
-        private readonly IGraphAllocator<TNode, TEdge> _allocator;
-        private readonly Dictionary<int, TNode>        _nodes;
-        private LinkedList<int>                        _freeNodeRids;
-        private LinkedList<Agent<TNode, TEdge>>        _agents;
+        private readonly Dictionary<int, TNode> _nodes;
+        private LinkedList<int>                 _freeNodeRids;
+        private LinkedList<Agent<TNode, TEdge>> _agents;
 
 
         //  CONSTRUCTORS
-        public Graph(IGraphAllocator<TNode, TEdge> allocator, int staticEdgeCount)
+        public Graph(int staticEdgeCount)
         {
-            IsFixed        = false;
-            _allocator     = allocator;
-            _nodes         = new Dictionary<int, TNode>();
-            NodeIdCounter  = -1;
+            IsFixed       = false;
+            _nodes        = new Dictionary<int, TNode>();
+            NodeIdCounter = -1;
 
-            NodeRidCounter      = 0;
+            NodeRidCounter       = 0;
             this.staticEdgeCount = staticEdgeCount;
-            _freeNodeRids       = new LinkedList<int>();
+            _freeNodeRids        = new LinkedList<int>();
 
             _agents = new LinkedList<Agent<TNode, TEdge>>();
         }
@@ -41,7 +39,7 @@ namespace Com.Bit34Games.Graphs
 
         //	METHODS
 #region Node Methods
-    
+
         public TNode GetNode(int id)
         {
             return _nodes[id];
@@ -52,6 +50,9 @@ namespace Com.Bit34Games.Graphs
             return _nodes.Values.GetEnumerator();
         }
 
+        abstract protected TNode AllocateNode();
+        abstract protected void FreeNode(TNode node);
+        
         protected TNode AddNode()
         {
             return AddNode(NodeIdCounter+1);
@@ -76,7 +77,7 @@ namespace Com.Bit34Games.Graphs
                 rid = NodeRidCounter++;
             }
 
-            TNode node = _allocator.CreateNode();
+            TNode node = AllocateNode();
             node.AddedToGraph(this, nodeId, rid, staticEdgeCount);
             _nodes.Add(node.Id, node);
             NodeIdCounter = Math.Max(NodeIdCounter, node.Id);
@@ -128,13 +129,15 @@ namespace Com.Bit34Games.Graphs
             _nodes.Remove(node.Id);
             node.RemovedFromGraph();
 
-            _allocator.FreeNode(node);
+            FreeNode(node);
         }
 
 #endregion
 
 #region Edge Methods
 
+        abstract protected TEdge AllocateEdge();
+        abstract protected void FreeEdge(TEdge edge);
         abstract protected float CalculateEdgeWeight(TNode sourceNode, TNode targetNode);
 
         protected TEdge AddEdge(int  sourceNodeId,
@@ -162,13 +165,13 @@ namespace Com.Bit34Games.Graphs
             }
 
             //	Create edge
-            TEdge edge = _allocator.CreateEdge();
+            TEdge edge = AllocateEdge();
 
             //	Create opposite edge
             TEdge oppositeEdge = null;
             if (createOpposite)
             {
-                oppositeEdge = _allocator.CreateEdge();
+                oppositeEdge = AllocateEdge();
             }
 
             //  Set Edges
@@ -230,7 +233,7 @@ namespace Com.Bit34Games.Graphs
             //  Remove edge
             TEdge oppositeEdge = (TEdge)edge.Opposite;
             edge.Reset();
-            _allocator.FreeEdge(edge);
+            FreeEdge(edge);
 
             //  Has an opposite
             if (oppositeEdge != null)
@@ -249,7 +252,7 @@ namespace Com.Bit34Games.Graphs
 #endregion
 
 #region Agent Methods
-    
+
         public void AddAgent(TAgent agent)
         {
             _agents.AddLast(agent);

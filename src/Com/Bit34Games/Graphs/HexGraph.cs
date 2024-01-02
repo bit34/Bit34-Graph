@@ -13,12 +13,11 @@ namespace Com.Bit34Games.Graphs
         private TNode[] _nodes;
 
 
-        //  CONSTRUCTOR(S)
-        public HexGraph(IGraphAllocator<TNode, TEdge> allocator,
-                        bool                          isYAxisUp,
-                        int                           columnCount,
-                        int                           rowCount) :
-            base(allocator, 6)
+        //  CONSTRUCTORS
+        public HexGraph(bool isYAxisUp,
+                        int  columnCount,
+                        int  rowCount) :
+            base(6)
         {
             this.isYAxisUp   = isYAxisUp;
             this.columnCount = columnCount;
