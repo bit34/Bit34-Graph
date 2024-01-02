@@ -1,8 +1,9 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public abstract class GridGraph<TNode, TEdge> : Graph<TNode, TEdge>
+    public abstract class GridGraph<TNode, TEdge, TAgent> : Graph<TNode, TEdge, TAgent>
         where TNode : GridNode<TEdge>
         where TEdge : GridEdge
+        where TAgent : Agent<TNode, TEdge>
     {
         //  CONSTRUCTORS
         public GridGraph(IGraphAllocator<TNode, TEdge> allocator, int staticEdgeCount) :

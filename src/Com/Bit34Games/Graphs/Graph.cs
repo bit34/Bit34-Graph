@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 namespace Com.Bit34Games.Graphs
 {
-    public abstract class Graph<TNode, TEdge> : IAgentOwner<TNode, TEdge>,
-                                                INodeOwner
+    public abstract class Graph<TNode, TEdge, TAgent> : IAgentOwner<TNode, TEdge>,
+                                                        INodeOwner
         where TNode : Node<TEdge>
         where TEdge : Edge
+        where TAgent : Agent<TNode, TEdge>
     {
         //	MEMBERS
         public bool         IsFixed { get; protected set; }
@@ -249,13 +250,13 @@ namespace Com.Bit34Games.Graphs
 
 #region Agent Methods
     
-        public void AddAgent(Agent<TNode, TEdge> agent)
+        public void AddAgent(TAgent agent)
         {
             _agents.AddLast(agent);
             agent.AddedToGraph(this);
         }
 
-        public void RemoveAgent(Agent<TNode, TEdge> agent)
+        public void RemoveAgent(TAgent agent)
         {
             _agents.Remove(agent);
             agent.RemovedFromGraph();

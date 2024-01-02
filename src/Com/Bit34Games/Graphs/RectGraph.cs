@@ -1,8 +1,9 @@
 ﻿namespace Com.Bit34Games.Graphs
 {
-    public abstract class RectGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
+    public abstract class RectGraph<TNode, TEdge, TAgent> : GridGraph<TNode, TEdge, TAgent>
         where TNode : RectNode<TEdge>
         where TEdge : RectEdge
+        where TAgent : Agent<TNode, TEdge>
     {
         //  MEMBERS
         public readonly bool isYAxisUp;
@@ -33,6 +34,7 @@
 
         //  METHODS
         abstract protected void InitializeNode(RectNode<TEdge> node, int column, int row);
+
         public TNode GetNodeByLocation( int column, int row)
         {
             return _nodes[column+(row*columnCount)];

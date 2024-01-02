@@ -1,8 +1,9 @@
 namespace Com.Bit34Games.Graphs
 {
-    public abstract class HexGraph<TNode, TEdge> : GridGraph<TNode, TEdge>
+    public abstract class HexGraph<TNode, TEdge, TAgent> : GridGraph<TNode, TEdge, TAgent>
         where TNode : HexNode<TEdge>
         where TEdge : HexEdge
+        where TAgent : Agent<TNode, TEdge>
     {
         //  MEMBERS
         public readonly bool isYAxisUp;

@@ -57,7 +57,7 @@ namespace Com.Bit34Games.Graphs
         protected TNode GetNode(TAgent agent, int nodeId)
         {
             return agent.owner.GetNode(nodeId);
-        } 
+        }
 
         public virtual bool CanAgentAccessEdge(TAgent agent, TEdge edge)
         {
