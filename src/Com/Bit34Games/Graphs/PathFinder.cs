@@ -1,6 +1,6 @@
 namespace Com.Bit34Games.Graphs
 {
-    public class PathFinder<TAgent, TNode, TEdge>
+    public abstract class PathFinder<TAgent, TNode, TEdge>
         where TAgent : Agent<TNode, TEdge>
         where TNode : Node<TEdge>
         where TEdge : Edge
@@ -8,14 +8,17 @@ namespace Com.Bit34Games.Graphs
         //  MEMBERS
         public readonly bool useStaticEdges;
         public readonly bool useDynamicEdges;
+        public readonly bool allowPartialPaths;
 
 
         //  CONSTRUCTOR(S)
         public PathFinder(bool useStaticEdges=true, 
-                          bool useDynamicEdges=true)
+                          bool useDynamicEdges=true,
+                          bool allowPartialPaths=false)
         {
-            this.useStaticEdges  = useStaticEdges;
-            this.useDynamicEdges = useDynamicEdges;
+            this.useStaticEdges    = useStaticEdges;
+            this.useDynamicEdges   = useDynamicEdges;
+            this.allowPartialPaths = allowPartialPaths;
         }
 
 
@@ -47,7 +50,13 @@ namespace Com.Bit34Games.Graphs
             //  Is end node reached
             if (process.EndReached())
             {
-                return new Path(process.startNode.Id, process.endNode.Id, process.BacktrackEdges());
+                return new Path(PathTypes.Full, process.startNode.Id, process.endNode.Id, process.GetFullPathEdges());
+            }
+
+            //  If allowed return partial path
+            if (allowPartialPaths)
+            {
+                return new Path(PathTypes.Partial, process.startNode.Id, process.endNode.Id, process.GetPartialPathEdges());
             }
 
             //  No valid path
@@ -59,9 +68,12 @@ namespace Com.Bit34Games.Graphs
             return agent.owner.GetNode(nodeId);
         }
 
-        public virtual bool CanAgentAccessEdge(TAgent agent, TEdge edge)
+        public virtual bool IsEdgeAccessible(TAgent agent, TEdge edge)
         {
             return true;
         }
+
+        abstract public float CalculateHeuristic(TNode node, TNode targetNode);
+
     }
 }

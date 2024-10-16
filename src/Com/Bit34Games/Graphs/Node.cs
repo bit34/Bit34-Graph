@@ -26,7 +26,6 @@ namespace Com.Bit34Games.Graphs
 
 
         //  METHODS
-
         public TEdge GetStaticEdge(int index)
         {
             return staticEdges[index];

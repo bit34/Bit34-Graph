@@ -2,17 +2,22 @@ namespace Com.Bit34Games.Graphs
 {
     internal class PathNode
     {
-        public readonly int id;
-        public readonly int rid;
-        public float        weight;
-        public Edge         selectedEdge;
-        public bool         isClosed;
+        //  MEMBERS
+        public readonly int   id;
+        public readonly int   rid;
+        public readonly float heuristic;
+        public float          weight;
+        public Edge           selectedEdge;
+        public bool           isClosed;
 
-        public PathNode(int id, 
-                        int rid)
+        //  CONSTRUCTORS
+        public PathNode(int   id, 
+                        int   rid,
+                        float heuristic)
         {
-            this.id  = id;
-            this.rid = rid;
+            this.id        = id;
+            this.rid       = rid;
+            this.heuristic = heuristic;
         }
     }
 }

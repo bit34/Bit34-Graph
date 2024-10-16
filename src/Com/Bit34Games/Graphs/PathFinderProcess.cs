@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+
 namespace Com.Bit34Games.Graphs
 {
     internal class PathFinderProcess<TAgent, TNode, TEdge>
@@ -13,8 +14,8 @@ namespace Com.Bit34Games.Graphs
         public readonly TNode                            startNode;
         public readonly TNode                            endNode;
         //      Private
-        private readonly PathNode[]           _pathNodes;
-        private readonly LinkedList<PathNode> _openPathNodeList;
+        internal readonly PathNode[]           _pathNodes;
+        internal readonly LinkedList<PathNode> _openPathNodeList;
 
         //  CONSTRUCTORS
         public PathFinderProcess(PathFinder<TAgent, TNode, TEdge> pathFinder,
@@ -30,7 +31,7 @@ namespace Com.Bit34Games.Graphs
             _openPathNodeList = new LinkedList<PathNode>();
 
             //  Initialize
-            _pathNodes[startNode.Rid] = new PathNode(startNode.Id, startNode.Rid);
+            _pathNodes[startNode.Rid] = new PathNode(startNode.Id, startNode.Rid, pathFinder.CalculateHeuristic(startNode, endNode));
             _openPathNodeList.AddLast(_pathNodes[startNode.Rid]);
         }
 
@@ -49,7 +50,7 @@ namespace Com.Bit34Games.Graphs
         public void PerformStep()
         {
             //  Remove node and mark as closed
-            PathNode openPathNode = PickOpenNodeWithLowestWeight();
+            PathNode openPathNode = PickOpenNode();
             TNode    openNode     = agent.owner.GetNode(openPathNode.id);
             openPathNode.isClosed = true;
 
@@ -78,33 +79,34 @@ namespace Com.Bit34Games.Graphs
             }
         }
 
-        public TEdge[] BacktrackEdges()
+        public TEdge[] GetFullPathEdges()
         {
-            LinkedList<TEdge> edges = new LinkedList<TEdge>();
-
-            //  Backtrack connections from end to start
-            TEdge edge = (TEdge)_pathNodes[endNode.Rid].selectedEdge;
-
-            do
-            {
-                edges.AddFirst(edge);
-                edge = (TEdge)_pathNodes[edge.SourceNodeRid].selectedEdge;
-            }
-            while (edge != null);
-
-            TEdge[] edgesArray = new TEdge[edges.Count];
-            LinkedListNode<TEdge> edgeNode = edges.First;
-            int i = 0;
-            while(edgeNode != null)
-            {
-                edgesArray[i++] = edgeNode.Value;
-                edgeNode = edgeNode.Next;
-            }
-
-            return edgesArray;
+            LinkedList<TEdge> edgeList = BacktrackEdges(_pathNodes[endNode.Rid]);
+            return ConvertEdgeListToArray(edgeList);
         }
 
-        private PathNode PickOpenNodeWithLowestWeight()
+        public TEdge[] GetPartialPathEdges()
+        {
+            PathNode startPathNode = _pathNodes[startNode.Rid];
+            float    foundValue    = startPathNode.heuristic;
+            int      foundRid      = startPathNode.rid;
+
+            //  Find node with lowest heuristic to use as end node
+            for (int i = 0; i < _pathNodes.Length; i++)
+            {
+                PathNode pathNode = _pathNodes[i];
+                if (pathNode != null && pathNode.heuristic < foundValue)
+                {
+                    foundValue = pathNode.heuristic;
+                    foundRid = i;
+                }
+            }
+            
+            LinkedList<TEdge> edgeList = BacktrackEdges(_pathNodes[foundRid]);
+            return ConvertEdgeListToArray(edgeList);
+        }
+
+        private PathNode PickOpenNode()
         {
             LinkedListNode<PathNode> lowest = _openPathNodeList.First;
 
@@ -125,20 +127,20 @@ namespace Com.Bit34Games.Graphs
 
         private void ProcessEdge(PathNode openNode, TEdge edge)
         {
-            if (pathFinder.CanAgentAccessEdge(agent, edge) == false)
+            if (pathFinder.IsEdgeAccessible(agent, edge) == false)
             {
                 return;
             }
 
+            TNode    targetNode         = agent.owner.GetNode(edge.TargetNodeId);
             PathNode targetPathNode     = _pathNodes[edge.TargetNodeRid];
             float    weightToTargetNode = openNode.weight + edge.Weight;
 
             //  If node is not visited
             if (targetPathNode == null)
             {
-                TNode targetNode            = agent.owner.GetNode(edge.TargetNodeId);
-                targetPathNode              = new PathNode(targetNode.Id, targetNode.Rid);
-                targetPathNode.weight       = weightToTargetNode;
+                targetPathNode              = new PathNode(targetNode.Id, targetNode.Rid, pathFinder.CalculateHeuristic(targetNode, endNode));
+                targetPathNode.weight       = weightToTargetNode + targetPathNode.heuristic;
                 targetPathNode.selectedEdge = edge;
                 _pathNodes[targetPathNode.rid] = targetPathNode;
                 _openPathNodeList.AddLast(targetPathNode);
@@ -146,12 +148,43 @@ namespace Com.Bit34Games.Graphs
             else 
             if (targetPathNode.isClosed == false)
             {
-                if (targetPathNode.weight > weightToTargetNode)
+                if (targetPathNode.weight > weightToTargetNode + targetPathNode.heuristic)
                 {
-                    targetPathNode.weight       = weightToTargetNode;
+                    targetPathNode.weight       = weightToTargetNode + targetPathNode.heuristic;
                     targetPathNode.selectedEdge = edge;
                 }
             }
+        }
+
+        private LinkedList<TEdge> BacktrackEdges(PathNode pathNode)
+        {
+            LinkedList<TEdge> edges = new LinkedList<TEdge>();
+
+            TEdge edge = (TEdge)_pathNodes[pathNode.rid].selectedEdge;
+            do
+            {
+                edges.AddFirst(edge);
+                edge = (TEdge)_pathNodes[edge.SourceNodeRid].selectedEdge;
+            }
+            while (edge != null);
+
+            return edges;
+        }
+
+        private TEdge[] ConvertEdgeListToArray(LinkedList<TEdge> edgeList)
+        {
+
+            TEdge[] edgeArray = new TEdge[edgeList.Count];
+
+            LinkedListNode<TEdge> edgeNode = edgeList.First;
+            int i = 0;
+            while(edgeNode != null)
+            {
+                edgeArray[i++] = edgeNode.Value;
+                edgeNode = edgeNode.Next;
+            }
+
+            return edgeArray;
         }
     }
 }
