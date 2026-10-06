@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Com_Bit34Games_Graphs</RootNamespace>
     <PackageId>Com.Bit34Games.Graph</PackageId>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Authors>Oguz Sandikci</Authors>
     <Company>Bit34 Games</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
